@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Start">
+
+	<!-- Variables -->
+	<PropertyGroup>
+
+		<!-- Release Folder -->
+		<!-- To change the output folder, use the following parameter: /p:BuildDir=C:\BuildTest-->
+		<MainReleaseDir>release</MainReleaseDir>
+		<ReleaseDir>$(MainReleaseDir)\bin</ReleaseDir>
+
+		<!-- Build Folder -->
+		<OutDir>src\BitbucketBackup\bin\Release</OutDir>
+
+	</PropertyGroup>
+
+
+	<!-- "Autostart" -->
+	<Target Name="Start">
+		<CallTarget Targets="Build"/>
+	</Target>
+
+	<!-- compile solution as release -->
+	<Target Name="Build">
+		<MSBuild Projects="StationeersMods.sln" Properties="Configuration=Release"/>
+	</Target>
+</Project>
