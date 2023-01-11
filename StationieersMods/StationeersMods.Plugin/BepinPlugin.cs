@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using BepInEx;
+﻿using BepInEx;
 using StationeersMods.Interface;
 using StationeersMods.Shared;
 using System.Linq;
 using System.Reflection;
-using Assets.Scripts;
-using Assets.Scripts.Networking;
-using Assets.Scripts.Networking.Transports;
-using Cysharp.Threading.Tasks;
-using HarmonyLib;
-using Steamworks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
-using Path = System.IO.Path;
 
 namespace StationeersMods.Plugin
 {
@@ -36,9 +25,6 @@ namespace StationeersMods.Plugin
         //The Awake() method is run at the very start when the game is initialized.
         public void Awake()
         {
-            
-            Harmony harmony = new Harmony("StationeersModsPlugin");
-            harmony.PatchAll();
             DontDestroyOnLoad(this);
             SceneManager.sceneLoaded += (Scene, LoadSceneMode) =>
             {

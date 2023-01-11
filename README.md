@@ -1,3 +1,6 @@
+
+[![Image](doc/discord_button.png)](https://discord.gg/AEmQR3XCGm)
+
 # StationeersMods
 
 This is a modding framework to create Stationeers mods. 

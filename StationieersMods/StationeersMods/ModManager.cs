@@ -132,6 +132,8 @@ namespace StationeersMods
         }
         private void addWorkshopItems()
         {
+            Debug.Log("StationeersMods: Start adding local and workshop mods");
+            
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
                 Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
             if(!SteamClient.IsValid)
