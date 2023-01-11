@@ -17,10 +17,10 @@ Add the following libraries to this folder:
 
 
 Sourced from:
-https://github.com/BepInEx/BepInEx/releases
-https://unity.com/
+- https://github.com/BepInEx/BepInEx/releases
+- https://unity.com/
 
 Alternate sources:
-https://github.com/MonoMod/MonoMod
-https://github.com/pardeike/Harmony
+- https://github.com/MonoMod/MonoMod
+- https://github.com/BepInEx/HarmonyX
 
