@@ -136,15 +136,16 @@ namespace StationeersMods
             
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
                 Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
+            var steamTransport = new SteamTransport();
             try
             {
-                if(!SteamClient.IsValid)
+                if (!SteamClient.IsValid)
                 {
-                    var steamTransport = new SteamTransport();
                     steamTransport.InitClient();
                 }
 
-                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask().ConfigureAwait(false);
+                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask()
+                    .ConfigureAwait(false);
                 var items = task.GetAwaiter().GetResult();
                 foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
                 {
@@ -166,8 +167,10 @@ namespace StationeersMods
                 Debug.Log("Failed loading items");
                 Debug.Log(e.Message);
             }
-
-            refreshInterval = 10;
+            finally
+            {
+                steamTransport.Shutdown();
+            }
         }
 
         private void OnModLoaded(Resource mod)
