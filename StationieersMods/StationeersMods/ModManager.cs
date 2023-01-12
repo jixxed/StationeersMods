@@ -144,8 +144,7 @@ namespace StationeersMods
                     steamTransport.InitClient();
                 }
 
-                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask()
-                    .ConfigureAwait(false);
+                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask();
                 var items = task.GetAwaiter().GetResult();
                 foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
                 {
