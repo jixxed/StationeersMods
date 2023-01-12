@@ -96,8 +96,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"
-if not exist "$(SolutionDir)build\StationeersMods\mods" mkdir "$(SolutionDir)build\StationeersMods\mods"</PostBuildEvent>
+    <PostBuildEvent>echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

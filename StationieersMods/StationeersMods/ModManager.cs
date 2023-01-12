@@ -136,28 +136,38 @@ namespace StationeersMods
             
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
                 Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
-            if(!SteamClient.IsValid)
+            try
             {
-                var steamTransport = new SteamTransport();
-                steamTransport.InitClient();
+                if(!SteamClient.IsValid)
+                {
+                    var steamTransport = new SteamTransport();
+                    steamTransport.InitClient();
+                }
+
+                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask().ConfigureAwait(false);
+                var items = task.GetAwaiter().GetResult();
+                foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
+                {
+                    SteamTransport.ItemWrapper item = localAndWorkshopItem;
+                    try
+                    {
+                        Debug.Log("Adding mod from: " + item.DirectoryPath + ". name: " + item.Title);
+                        AddSearchDirectory(item.DirectoryPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(string.Format("Error loading mod with id {0}", (object) item.Id));
+                        Debug.Log(ex.Message);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Failed loading items");
+                Debug.Log(e.Message);
             }
 
-            var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask().ConfigureAwait(false);
-            var items = task.GetAwaiter().GetResult();
-            foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
-            {
-                SteamTransport.ItemWrapper item = localAndWorkshopItem;
-                try
-                {
-                    Debug.Log("Adding mod from: " + item.DirectoryPath + ". name: " + item.Title);
-                    AddSearchDirectory(item.DirectoryPath);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log(string.Format("Error loading mod with id {0}", (object) item.Id));
-                    Debug.Log(ex.Message);
-                }
-            }
+            refreshInterval = 10;
         }
 
         private void OnModLoaded(Resource mod)
