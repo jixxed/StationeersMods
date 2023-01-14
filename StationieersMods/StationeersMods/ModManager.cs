@@ -14,6 +14,7 @@ using BepInEx;
 using Cysharp.Threading.Tasks;
 using StationeersMods.Shared;
 using Steamworks;
+using Steamworks.Ugc;
 using UnityEngine;
 
 namespace StationeersMods
@@ -127,48 +128,131 @@ namespace StationeersMods
             searchDirectories = new List<ModSearchDirectory>();
 
             mods = _mods.AsReadOnly();
-            addWorkshopItems();
-
+            AddLocalAndWorkshopItems();
         }
-        private void addWorkshopItems()
+
+        private async void AddLocalAndWorkshopItems()
         {
             Debug.Log("StationeersMods: Start adding local and workshop mods");
-            
+
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
                 Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
             var steamTransport = new SteamTransport();
+
+            if (!SteamClient.IsValid)
+            {
+                SteamClient.Init(544550U);
+            }
+
             try
             {
-                if (!SteamClient.IsValid)
-                {
-                    steamTransport.InitClient();
-                }
+                var items = await GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod);
 
-                var task = NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod).AsTask();
-                var items = task.GetAwaiter().GetResult();
+
                 foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
                 {
                     SteamTransport.ItemWrapper item = localAndWorkshopItem;
-                    try
-                    {
-                        Debug.Log("Adding mod from: " + item.DirectoryPath + ". name: " + item.Title);
-                        AddSearchDirectory(item.DirectoryPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.Log(string.Format("Error loading mod with id {0}", (object) item.Id));
-                        Debug.Log(ex.Message);
-                    }
+                    Debug.Log("Adding search directory: " + item.DirectoryPath + ". name: " + item.Title);
+                    AddSearchDirectory(item.DirectoryPath);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex) 
             {
-                Debug.Log("Failed loading items");
-                Debug.Log(e.Message);
+                Debug.LogException(ex);
             }
-            finally
+
+            SteamClient.Shutdown();
+        }
+
+        public static async UniTask<IReadOnlyList<SteamTransport.ItemWrapper>> GetLocalAndWorkshopItems(
+            SteamTransport.WorkshopType type)
+        {
+            List<SteamTransport.ItemWrapper> items;
+
+            DirectoryInfo localDirInfo = type.GetLocalDirInfo();
+            string fileName = type.GetLocalFileName();
+            Debug.Log("StationeersMods: Add local");
+            items = new List<SteamTransport.ItemWrapper>();
+            if (localDirInfo.Exists)
             {
-                steamTransport.Shutdown();
+                items.AddRange(
+                    localDirInfo.GetDirectories("*", SearchOption.AllDirectories)
+                        .SelectMany((d => (IEnumerable<FileInfo>) d.GetFiles()))
+                        .Where(f => f.Name == fileName)
+                        .Select(f => SteamTransport.ItemWrapper.WrapLocalItem(f, type))
+                );
+            }
+
+            Debug.Log("StationeersMods: Add remote");
+            var workshopItems = await Workshop_QueryItemsAsync(type);
+            items.AddRange(workshopItems);
+            items.Sort(((b, a) =>
+                a.LastWriteTime.CompareTo(b.LastWriteTime)));
+            return items;
+        }
+
+        public static async UniTask<IEnumerable<SteamTransport.ItemWrapper>> Workshop_QueryItemsAsync(
+            SteamTransport.WorkshopType itemType,
+            uint page = 1)
+        {
+            List<Item> entries;
+            IEnumerable<SteamTransport.ItemWrapper> result;
+
+            if (!SteamClient.IsValid)
+            {
+                result = Enumerable.Empty<SteamTransport.ItemWrapper>();
+            }
+            else
+            {
+                entries = new List<Item>();
+                try
+                {
+                    Debug.Log("StationeersMods: query");
+                    Query query = Query.Items;
+                    query = query.WithTag(GetTagFromType(itemType));
+                    var resultPage = await query.AllowCachedResponse(0).WhereUserSubscribed()
+                        .GetPageAsync((int) page).AsUniTask();
+
+                    entries = (resultPage.HasValue
+                        ? resultPage.GetValueOrDefault().Entries.ToList()
+                        : null) ?? new List<Item>();
+
+                    Debug.Log("StationeersMods: update");
+                    var test = await UniTask.WhenAll(
+                        entries
+                            .Where(x => x.NeedsUpdate || !Directory.Exists(x.Directory))
+                            .Select(x => SteamUGC.DownloadAsync(x.Id).AsUniTask())
+                    );
+
+                    Debug.Log("StationeersMods: wrap");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+                string fileName = itemType.GetLocalFileName();
+                if (itemType == SteamTransport.WorkshopType.Mod)
+                {
+                    fileName = "About\\" + fileName;
+                }
+                result = entries.Select(x => SteamTransport.ItemWrapper.WrapWorkshopItem(x, fileName));
+            }
+
+            return result;
+        }
+
+        private static string GetTagFromType(SteamTransport.WorkshopType type)
+        {
+            switch (type)
+            {
+                case SteamTransport.WorkshopType.World:
+                    return "World Save";
+                case SteamTransport.WorkshopType.Mod:
+                    return "Mod";
+                case SteamTransport.WorkshopType.ICCode:
+                    return "IC Code";
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -384,13 +468,13 @@ namespace StationeersMods
         protected override void OnDestroy()
         {
             queuedRefreshMods.Clear();
-            
+
             foreach (var mod in _mods)
             {
                 mod.Unload();
                 mod.SetInvalid();
             }
-            
+
             foreach (var searchDirectory in searchDirectories) searchDirectory.Dispose();
 
             base.OnDestroy();

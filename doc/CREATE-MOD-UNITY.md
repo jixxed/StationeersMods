@@ -18,9 +18,11 @@ You can click Ignore and try to fix the issues. This will usually be related to 
 
 ## Unity Editor 
 Once the project is imported you can check the asmdef in the Scripts folder. it should look like this:
+
 ![Image](asmdef.png)
 
 To build the mod you can open the exporter from the menu
+
 ![Image](export_menu.png)
 
 Fill in the settings:
@@ -50,6 +52,7 @@ Start the game and check the logs. This example mod writes a `Hello World!` to t
 
 You can see it in game if you have the UnityExplorer plugin or if you check the game log
 (AppData\LocalLow\Rocketwerkz\rocketstation\Player.log) 
+
 ![Image](load_success.png)
 
 ## Modifications
