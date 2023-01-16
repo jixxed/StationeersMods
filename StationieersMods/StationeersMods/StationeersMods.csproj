@@ -40,30 +40,16 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=0.2.3545.17252, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\StationeersMods.Patcher\bin\Debug\Assembly-CSharp.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HarmonyX.2.9.0\lib\net45\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>..\libs\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="Facepunch.Steamworks.Win64, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\libs\Facepunch.Steamworks.Win64.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="UniTask, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\libs\UniTask.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\libs\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="BepInEx.BaseLib, Version=5.4.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\BepInEx.BaseLib.5.4.21\lib\net35\BepInEx.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
+  <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
     <Compile Include="AssetBundleResource.cs" />
     <Compile Include="Dispatcher.cs" />
@@ -93,6 +79,9 @@
       <Project>{5E13231B-CA13-4496-B32C-BB033B15A379}</Project>
       <Name>StationeersMods.Shared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

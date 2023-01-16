@@ -10,8 +10,8 @@ namespace StationeersMods.Editor
 {
     public class Export
     {
-        private readonly List<string> asmDefPaths;
-        private readonly List<string> copyPaths;
+        // private readonly List<string> asmDefPaths;
+        // private readonly List<string> copyPaths;
         private readonly List<string> assetPaths;
         private readonly List<string> scenePaths;
         private readonly string modDirectory;

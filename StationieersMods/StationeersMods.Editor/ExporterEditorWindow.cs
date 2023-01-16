@@ -15,7 +15,7 @@ namespace StationeersMods.Editor
         private ExportSettingsEditor exportSettingsEditor;
 
         private int selectedTab = 0;
-        private int selectedPath = 0;
+        // private int selectedPath = 0;
         private List<string> addedAsmdefs = new List<string>();
 
         ExportEditor exportEditor;

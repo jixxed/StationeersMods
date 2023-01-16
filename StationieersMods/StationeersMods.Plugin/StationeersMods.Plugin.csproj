@@ -40,34 +40,17 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony20">
-      <HintPath>..\..\..\..\source\repos\CircuitHousingMod\Libraries\0Harmony20.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\ExampleMod\Assets\Assemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx, Version=5.4.19.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BepInEx.BaseLib, Version=5.4.21.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="Facepunch.Steamworks.Win64, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\libs\Facepunch.Steamworks.Win64.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="UniTask, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\libs\UniTask.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\libs\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\packages\BepInEx.BaseLib.5.4.21\lib\net35\BepInEx.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
+  <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
     <Compile Include="BepinPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +80,7 @@
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
+  
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

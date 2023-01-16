@@ -1,0 +1,6 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <StationeersDirectory>E:\GAMES\steamapps\common\Stationeers\</StationeersDirectory> <!-- Change this to the path to your Stationeers directory -->
+    <UnityEditorDirectory>C:\Program Files\Unity 2021.2.13f1\Editor\Data\Managed</UnityEditorDirectory>
+  </PropertyGroup>
+</Project>

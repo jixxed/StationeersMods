@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StationeersMods.Patcher</RootNamespace>
     <AssemblyName>StationeersMods.Patcher</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -40,25 +40,27 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\ExampleMod\Assets\Assemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx, Version=5.4.19.0, Culture=neutral, processorArchitecture=MSIL">
+<!--    <Reference Include="Assembly-CSharp">-->
+<!--      <HintPath>..\..\ExampleMod\Assets\Assemblies\Assembly-CSharp.dll</HintPath>-->
+<!--    </Reference>-->
+    <Reference Include="BepInEx.BaseLib, Version=5.4.21.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\BepInEx.dll</HintPath>
+      <HintPath>..\..\packages\BepInEx.BaseLib.5.4.21\lib\net35\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\libs\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
+<!--    <Reference Include="System" />-->
+<!--    <Reference Include="System.Core" />-->
+<!--    <Reference Include="UnityEngine">-->
+<!--      <HintPath>..\libs\UnityEngine.dll</HintPath>-->
+<!--    </Reference>-->
+<!--    <Reference Include="UnityEngine.AssetBundleModule">-->
+<!--      <HintPath>..\libs\UnityEngine.AssetBundleModule.dll</HintPath>-->
+<!--    </Reference>-->
+<!--    <Reference Include="UnityEngine.CoreModule">-->
+<!--      <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>-->
+<!--    </Reference>-->
   </ItemGroup>
+  <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
+  <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
     <Compile Include="BepinPatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
