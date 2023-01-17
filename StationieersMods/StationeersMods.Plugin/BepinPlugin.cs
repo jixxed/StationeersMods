@@ -39,6 +39,10 @@ namespace StationeersMods.Plugin
                         var refreshButtonsMethod = typeof(WorkshopMenu).GetMethod("RefreshButtons", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                         var refreshButtonsPostfixPrefix = typeof(WorkshopMenuPatch).GetMethod("RefreshButtonsPostfix");
                         harmony.Patch(refreshButtonsMethod, null, new HarmonyMethod(refreshButtonsPostfixPrefix));
+                        
+                        var selectModMethod = typeof(WorkshopMenu).GetMethod("SelectMod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var selectModPostfixPrefix = typeof(WorkshopMenuPatch).GetMethod("SelectModPostfix");
+                        harmony.Patch(selectModMethod, null, new HarmonyMethod(selectModPostfixPrefix));
                     }
                     catch (Exception ex)
                     {
