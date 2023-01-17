@@ -57,5 +57,10 @@ You can see it in game if you have the UnityExplorer plugin or if you check the 
 
 ## Modifications
 
-To make the mod your own, replace ExampleMod everywhere with your own name. 
-You can do this at the beginning by editing the files in the `Scripts` folder, before importing the project in Unity. 
+To make the mod your own, replace ExampleMod **EVERYWHERE** with your own name. 
+You can do this at the beginning, after extraction, by editing the files in the `Scripts` folder and the scene in the `Scenes` folder, before importing the project in Unity. 
+The word `ExampleMod` should **NOT** appear anywhere before you publish. The scene also needs to have a unique name, otherwise it might conflict with other mods.
+
+there is a `stationeersmods` file in the `About` folder. This file is mandatory for StationeersMods mods as a way to recognize the mod needs to be processed as a StationeersMods mod.
+
+An overlay image is provided for you to use to create your own thumbnail.

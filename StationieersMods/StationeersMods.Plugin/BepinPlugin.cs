@@ -1,8 +1,10 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using StationeersMods.Interface;
 using StationeersMods.Shared;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -30,6 +32,19 @@ namespace StationeersMods.Plugin
             {
                 if (Scene.name.ToLower().Equals("splash"))
                 {
+                    Debug.Log("Patching WorkshopManager using Harmony...");
+                    try
+                    {
+                        Harmony harmony = new Harmony("StationeersMods");
+                        var refreshButtonsMethod = typeof(WorkshopMenu).GetMethod("RefreshButtons", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var refreshButtonsPostfixPrefix = typeof(WorkshopMenuPatch).GetMethod("RefreshButtonsPostfix");
+                        harmony.Patch(refreshButtonsMethod, null, new HarmonyMethod(refreshButtonsPostfixPrefix));
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("Failed to initialize workshop publish patch.");
+                        Debug.LogException(ex);
+                    }
                     Init();
                 }
             };

@@ -69,6 +69,7 @@
     <Compile Include="ExporterEditorWindow.cs" />
     <Compile Include="ExportSettingsEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StationeersMods.Shared\StationeersMods.Shared.csproj">

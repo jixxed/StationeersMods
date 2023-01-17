@@ -59,6 +59,7 @@
     <Compile Include="Mod.cs" />
     <Compile Include="ModScene.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\AssemblyInfo.cs" />
     <Compile Include="ResourceLoadState.cs" />
     <Compile Include="SceneExtensions.cs" />
     <Compile Include="UnitySingleton.cs" />
