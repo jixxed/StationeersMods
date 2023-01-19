@@ -2,16 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Assets.Scripts;
+using Assets.Scripts.Localization2;
 using Assets.Scripts.Networking;
 using Assets.Scripts.Networking.Transports;
 using Assets.Scripts.Serialization;
+using Assets.Scripts.UI;
+using Assets.Scripts.Util;
 using BepInEx;
 using Cysharp.Threading.Tasks;
+using HarmonyLib;
 using StationeersMods.Shared;
 using Steamworks;
 using Steamworks.Ugc;
@@ -34,7 +42,7 @@ namespace StationeersMods
         private Dispatcher dispatcher;
         private List<Mod> queuedRefreshMods;
 
-        private List<ModSearchDirectory> searchDirectories;
+        private static List<ModSearchDirectory> searchDirectories;
         private WaitForSeconds wait;
 
         /// <summary>
@@ -128,9 +136,10 @@ namespace StationeersMods
             searchDirectories = new List<ModSearchDirectory>();
 
             mods = _mods.AsReadOnly();
+            //patch for running both Addons and StationeersMods, somehow causing StringManager not to be initialized in time
+            StringManager.Initialize();
             AddLocalAndWorkshopItems();
         }
-
         private async void AddLocalAndWorkshopItems()
         {
             Debug.Log("StationeersMods: Start adding local and workshop mods");
@@ -152,11 +161,14 @@ namespace StationeersMods
                 foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
                 {
                     SteamTransport.ItemWrapper item = localAndWorkshopItem;
-                    Debug.Log("Adding search directory: " + item.DirectoryPath + ". name: " + item.Title);
-                    AddSearchDirectory(item.DirectoryPath);
+                    if (File.Exists(item.DirectoryPath + "\\About\\stationeersmods"))
+                    {
+                        Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " + item.Title);
+                        AddSearchDirectory(item.DirectoryPath);
+                    }
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Debug.LogException(ex);
             }
@@ -171,7 +183,6 @@ namespace StationeersMods
 
             DirectoryInfo localDirInfo = type.GetLocalDirInfo();
             string fileName = type.GetLocalFileName();
-            Debug.Log("StationeersMods: Add local");
             items = new List<SteamTransport.ItemWrapper>();
             if (localDirInfo.Exists)
             {
@@ -183,7 +194,6 @@ namespace StationeersMods
                 );
             }
 
-            Debug.Log("StationeersMods: Add remote");
             var workshopItems = await Workshop_QueryItemsAsync(type);
             items.AddRange(workshopItems);
             items.Sort(((b, a) =>
@@ -207,7 +217,6 @@ namespace StationeersMods
                 entries = new List<Item>();
                 try
                 {
-                    Debug.Log("StationeersMods: query");
                     Query query = Query.Items;
                     query = query.WithTag(GetTagFromType(itemType));
                     var resultPage = await query.AllowCachedResponse(0).WhereUserSubscribed()
@@ -217,14 +226,12 @@ namespace StationeersMods
                         ? resultPage.GetValueOrDefault().Entries.ToList()
                         : null) ?? new List<Item>();
 
-                    Debug.Log("StationeersMods: update");
                     var test = await UniTask.WhenAll(
                         entries
                             .Where(x => x.NeedsUpdate || !Directory.Exists(x.Directory))
                             .Select(x => SteamUGC.DownloadAsync(x.Id).AsUniTask())
                     );
 
-                    Debug.Log("StationeersMods: wrap");
                 }
                 catch (Exception ex)
                 {
@@ -259,7 +266,9 @@ namespace StationeersMods
         private void OnModLoaded(Resource mod)
         {
             if (ModLoaded != null)
+            {
                 ModLoaded.Invoke((Mod) mod);
+            }
         }
 
         private void OnModUnloaded(Resource mod)

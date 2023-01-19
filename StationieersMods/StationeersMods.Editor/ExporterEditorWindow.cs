@@ -51,7 +51,7 @@ namespace StationeersMods.Editor
         {
             if (exportEditor.Draw(settings))
             {
-                var buttonPressed = GUILayout.Button("Export", GUILayout.Height(30));
+                var buttonPressed = GUILayout.Button("Save & Export", GUILayout.Height(30));
 
                 GUILayout.FlexibleSpace();
 

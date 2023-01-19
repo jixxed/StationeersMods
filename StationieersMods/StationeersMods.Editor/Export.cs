@@ -194,6 +194,7 @@ namespace StationeersMods.Editor
         public static void ExportMod(ExportSettings settings)
         {
             var exporter = new Export(settings);
+            EditorUtility.SetDirty(settings);
             exporter.Run();
         }
     }

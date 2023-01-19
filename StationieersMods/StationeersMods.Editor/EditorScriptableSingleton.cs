@@ -33,8 +33,10 @@ namespace StationeersMods.Editor
             Debug.Log("Getting export settings.");
 
             if (_instance == null)
+            {
                 Debug.Log("Instance was null, loading resource " + typeof(T).Name);
-            _instance = Resources.Load<T>(typeof(T).Name);
+                _instance = Resources.Load<T>(typeof(T).Name);
+            }
             //  Debug.Log("settings found " + _instance.ToString());
 
             if (_instance == null)
