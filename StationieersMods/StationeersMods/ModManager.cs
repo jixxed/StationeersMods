@@ -138,8 +138,34 @@ namespace StationeersMods
             mods = _mods.AsReadOnly();
             //patch for running both Addons and StationeersMods, somehow causing StringManager not to be initialized in time
             StringManager.Initialize();
+            
+                Harmony harmony = new Harmony("StationeersMods.ModManager");
+                harmony.Patch(
+                    typeof(WorldManager).GetMethod("LoadDataFiles", BindingFlags.NonPublic | BindingFlags.Static),
+                    new HarmonyMethod(typeof(ModManager).GetMethod("WorldManagerFix", BindingFlags.NonPublic | BindingFlags.Static)));
             AddLocalAndWorkshopItems();
         }
+
+        private static bool WorldManagerFix()
+        {
+            List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
+            for (int index = mods.Count - 1; index >= 0; --index)
+            {
+                ModData modData = mods[index];
+                if (!modData.IsCore && modData.IsEnabled)
+                {
+                    typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                        .Invoke(null, new[] {modData.LocalPath + "/GameData"});
+                }
+                else if (modData.IsCore)
+                {
+                    typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                        .Invoke(null, new []{Application.streamingAssetsPath + "/Data"});
+                }
+            }
+            return false;
+        }
+
         private async void AddLocalAndWorkshopItems()
         {
             Debug.Log("StationeersMods: Start adding local and workshop mods");
