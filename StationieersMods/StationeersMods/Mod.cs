@@ -28,7 +28,7 @@ namespace StationeersMods
         private Dictionary<Type, object> allInstances;
         private List<Assembly> assemblies;
 
-        private readonly List<string> assemblyFiles;
+        public List<string> assemblyFiles { get; private set; }
 
         private readonly AssetBundleResource assetsResource;
         private readonly AssetBundleResource scenesResource;
@@ -46,13 +46,17 @@ namespace StationeersMods
 
             var modDirectory = Path.GetDirectoryName(path);
             var platformDirectory = Path.Combine(modDirectory, Application.platform.GetModPlatform().ToString());
-
-            var assets = Path.Combine(platformDirectory, modInfo.name.ToLower() + ".assets");
-            var scenes = Path.Combine(platformDirectory, modInfo.name.ToLower() + ".scenes");
-
             assemblyFiles = AssemblyUtility.GetAssemblies(modDirectory, AssemblyFilter.ModAssemblies);
-            assetsResource = new AssetBundleResource(name + " assets", assets);
-            scenesResource = new AssetBundleResource(name + " scenes", scenes);
+            if (contentTypes.HasFlag(ContentType.scenes))
+            {
+                var assetsPath = Path.Combine(platformDirectory, modInfo.name.ToLower() + ".assets");
+                var scenesPath = Path.Combine(platformDirectory, modInfo.name.ToLower() + ".scenes");
+
+                if (File.Exists(assetsPath))
+                    assetsResource = new AssetBundleResource(name + " assets", assetsPath);
+                if (File.Exists(scenesPath))
+                    scenesResource = new AssetBundleResource(name + " scenes", scenesPath);
+            }
 
             isValid = true;
 
@@ -180,22 +184,25 @@ namespace StationeersMods
             conflictingMods = _conflictingMods.AsReadOnly();
             assemblyNames = _assemblyNames.AsReadOnly();
 
-            assetPaths = assetsResource.assetPaths;
-            sceneNames = scenesResource.assetPaths;
-
-            assetsResource.Loaded += OnAssetsResourceLoaded;
-            scenesResource.Loaded += OnScenesResourceLoaded;
-
-            foreach (var sceneName in sceneNames)
+            if (contentTypes.HasFlag(ContentType.scenes))
             {
-                var modScene = new ModScene(sceneName, this);
+                sceneNames = scenesResource.assetPaths;
+                scenesResource.Loaded += OnScenesResourceLoaded;
+                foreach (var sceneName in sceneNames)
+                {
+                    var modScene = new ModScene(sceneName, this);
 
-                modScene.Loaded += OnSceneLoaded;
-                modScene.Unloaded += OnSceneUnloaded;
-                modScene.LoadCancelled += OnSceneLoadCancelled;
+                    modScene.Loaded += OnSceneLoaded;
+                    modScene.Unloaded += OnSceneUnloaded;
+                    modScene.LoadCancelled += OnSceneLoadCancelled;
 
-                _scenes.Add(modScene);
+                    _scenes.Add(modScene);
+                }
+
+                assetPaths = assetsResource.assetPaths;
+                assetsResource.Loaded += OnAssetsResourceLoaded;
             }
+
 
             foreach (var assembly in assemblyFiles)
                 _assemblyNames.Add(Path.GetFileName(assembly));
@@ -275,7 +282,7 @@ namespace StationeersMods
         {
             try
             {
-                if (assetsResource.assetBundle == null)
+                if (assetsResource == null || assetsResource.assetBundle == null)
                     throw new Exception("Could not load assets.");
 
                 var prefabs = assetsResource.assetBundle.LoadAllAssets<GameObject>();
@@ -291,7 +298,7 @@ namespace StationeersMods
 
         private void OnScenesResourceLoaded(Resource resource)
         {
-            if (scenesResource.assetBundle == null)
+            if (scenesResource == null || scenesResource.assetBundle == null)
             {
                 LogUtility.LogError("Could not load scenes.");
                 SetInvalid();
@@ -304,10 +311,11 @@ namespace StationeersMods
             LogUtility.LogInfo("Loading Mod: " + name);
 
             LoadAssemblies();
+            if (assetsResource != null)
+                assetsResource.Load();
 
-            assetsResource.Load();
-
-            scenesResource.Load();
+            if (scenesResource != null)
+                scenesResource.Load();
 
             yield break;
         }
@@ -318,9 +326,11 @@ namespace StationeersMods
 
             LoadAssemblies();
 
-            assetsResource.LoadAsync();
+            if (assetsResource != null)
+                assetsResource.LoadAsync();
 
-            scenesResource.LoadAsync();
+            if (scenesResource != null)
+                scenesResource.LoadAsync();
 
             yield return UpdateProgress(assetsResource, scenesResource);
         }
@@ -330,27 +340,30 @@ namespace StationeersMods
             if (resources == null || resources.Length == 0)
                 yield break;
 
-            var loadingResources = resources.Where(r => r.canLoad);
-
-            var count = loadingResources.Count();
-
-            while (true)
+            if (resources != null)
             {
-                var isDone = true;
-                float progress = 0;
+                var loadingResources = resources.Where(r => r.canLoad);
 
-                foreach (var resource in loadingResources)
+                var count = loadingResources.Count();
+
+                while (true)
                 {
-                    isDone = isDone && resource.loadState == ResourceLoadState.Loaded;
-                    progress += resource.loadProgress;
+                    var isDone = true;
+                    float progress = 0;
+
+                    foreach (var resource in loadingResources)
+                    {
+                        isDone = isDone && resource.loadState == ResourceLoadState.Loaded;
+                        progress += resource.loadProgress;
+                    }
+
+                    loadProgress = progress / count;
+
+                    if (isDone)
+                        yield break;
+
+                    yield return null;
                 }
-
-                loadProgress = progress / count;
-
-                if (isDone)
-                    yield break;
-
-                yield return null;
             }
         }
 
@@ -371,8 +384,10 @@ namespace StationeersMods
             assemblies.Clear();
             _prefabs.Clear();
 
-            assetsResource.Unload();
-            scenesResource.Unload();
+            if (assetsResource != null)
+                assetsResource.Unload();
+            if (scenesResource != null)
+                scenesResource.Unload();
 
             Resources.UnloadUnusedAssets();
             GC.Collect();
@@ -448,19 +463,22 @@ namespace StationeersMods
                     }
                 }
 
-            foreach (var sceneName in sceneNames)
-            foreach (var otherSceneName in other.sceneNames)
-                if (sceneName == otherSceneName)
-                {
-                    Debug.Log("Scene " + other.name + "/" + otherSceneName + " conflicting with " + name + "/" +
-                              sceneName);
+            if (sceneNames != null)
+                foreach (var sceneName in sceneNames)
+                    if (other.sceneNames != null)
+                        foreach (var otherSceneName in other.sceneNames)
+                            if (sceneName == otherSceneName)
+                            {
+                                Debug.Log("Scene " + other.name + "/" + otherSceneName + " conflicting with " + name +
+                                          "/" +
+                                          sceneName);
 
-                    if (!_conflictingMods.Contains(other))
-                    {
-                        _conflictingMods.Add(other);
-                        return;
-                    }
-                }
+                                if (!_conflictingMods.Contains(other))
+                                {
+                                    _conflictingMods.Add(other);
+                                    return;
+                                }
+                            }
         }
 
         /// <summary>
@@ -505,7 +523,7 @@ namespace StationeersMods
         /// <returns>The asset if it has been found. Null otherwise</returns>
         public Object GetAsset(string name)
         {
-            if (assetsResource.loadState == ResourceLoadState.Loaded)
+            if (assetsResource != null && assetsResource.loadState == ResourceLoadState.Loaded)
                 return assetsResource.assetBundle.LoadAsset(name);
 
             return null;
@@ -519,7 +537,7 @@ namespace StationeersMods
         /// <returns>The asset if it has been found. Null otherwise</returns>
         public T GetAsset<T>(string name) where T : Object
         {
-            if (assetsResource.loadState == ResourceLoadState.Loaded)
+            if (assetsResource != null && assetsResource.loadState == ResourceLoadState.Loaded)
                 return assetsResource.assetBundle.LoadAsset<T>(name);
 
             return null;
@@ -532,7 +550,7 @@ namespace StationeersMods
         /// <returns>AssetBundleRequest that can be used to get the asset.</returns>
         public T[] GetAssets<T>() where T : Object
         {
-            if (assetsResource.loadState == ResourceLoadState.Loaded)
+            if (assetsResource != null && assetsResource.loadState == ResourceLoadState.Loaded)
                 return assetsResource.assetBundle.LoadAllAssets<T>();
 
             return new T[0];
@@ -546,7 +564,7 @@ namespace StationeersMods
         /// <returns>AssetBundleRequest that can be used to get the asset.</returns>
         public AssetBundleRequest GetAssetAsync<T>(string name) where T : Object
         {
-            if (assetsResource.loadState == ResourceLoadState.Loaded)
+            if (assetsResource != null && assetsResource.loadState == ResourceLoadState.Loaded)
                 return assetsResource.assetBundle.LoadAssetAsync<T>(name);
 
             return null;
@@ -559,7 +577,7 @@ namespace StationeersMods
         /// <returns>AssetBundleRequest that can be used to get the assets.</returns>
         public AssetBundleRequest GetAssetsAsync<T>() where T : Object
         {
-            if (assetsResource.loadState == ResourceLoadState.Loaded)
+            if (assetsResource != null && assetsResource.loadState == ResourceLoadState.Loaded)
                 return assetsResource.assetBundle.LoadAllAssetsAsync<T>();
 
             return null;

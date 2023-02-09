@@ -138,11 +138,12 @@ namespace StationeersMods
             mods = _mods.AsReadOnly();
             //patch for running both Addons and StationeersMods, somehow causing StringManager not to be initialized in time
             StringManager.Initialize();
-            
-                Harmony harmony = new Harmony("StationeersMods.ModManager");
-                harmony.Patch(
-                    typeof(WorldManager).GetMethod("LoadDataFiles", BindingFlags.NonPublic | BindingFlags.Static),
-                    new HarmonyMethod(typeof(ModManager).GetMethod("WorldManagerFix", BindingFlags.NonPublic | BindingFlags.Static)));
+
+            Harmony harmony = new Harmony("StationeersMods.ModManager");
+            harmony.Patch(
+                typeof(WorldManager).GetMethod("LoadDataFiles", BindingFlags.NonPublic | BindingFlags.Static),
+                new HarmonyMethod(typeof(ModManager).GetMethod("WorldManagerFix",
+                    BindingFlags.NonPublic | BindingFlags.Static)));
             AddLocalAndWorkshopItems();
         }
 
@@ -160,9 +161,10 @@ namespace StationeersMods
                 else if (modData.IsCore)
                 {
                     typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                        .Invoke(null, new []{Application.streamingAssetsPath + "/Data"});
+                        .Invoke(null, new[] {Application.streamingAssetsPath + "/Data"});
                 }
             }
+
             return false;
         }
 
@@ -173,10 +175,16 @@ namespace StationeersMods
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
                 Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
             var steamTransport = new SteamTransport();
-
-            if (!SteamClient.IsValid)
+            try
             {
-                SteamClient.Init(544550U);
+                if (!SteamClient.IsValid)
+                {
+                    SteamClient.Init(544550U);
+                }
+            }
+            catch (Exception)
+            {
+                Debug.Log("Steam client init failed. Workshop mods won't load.");
             }
 
             try
@@ -189,7 +197,8 @@ namespace StationeersMods
                     SteamTransport.ItemWrapper item = localAndWorkshopItem;
                     if (File.Exists(item.DirectoryPath + "\\About\\stationeersmods"))
                     {
-                        Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " + item.Title);
+                        Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " +
+                                  item.Title);
                         AddSearchDirectory(item.DirectoryPath);
                     }
                 }
@@ -220,8 +229,12 @@ namespace StationeersMods
                 );
             }
 
-            var workshopItems = await Workshop_QueryItemsAsync(type);
-            items.AddRange(workshopItems);
+            if (SteamClient.IsValid)
+            {
+                var workshopItems = await Workshop_QueryItemsAsync(type);
+                items.AddRange(workshopItems);
+            }
+
             items.Sort(((b, a) =>
                 a.LastWriteTime.CompareTo(b.LastWriteTime)));
             return items;
@@ -257,17 +270,18 @@ namespace StationeersMods
                             .Where(x => x.NeedsUpdate || !Directory.Exists(x.Directory))
                             .Select(x => SteamUGC.DownloadAsync(x.Id).AsUniTask())
                     );
-
                 }
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
                 }
+
                 string fileName = itemType.GetLocalFileName();
                 if (itemType == SteamTransport.WorkshopType.Mod)
                 {
                     fileName = "About\\" + fileName;
                 }
+
                 result = entries.Select(x => SteamTransport.ItemWrapper.WrapWorkshopItem(x, fileName));
             }
 
