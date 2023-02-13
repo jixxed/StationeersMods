@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using BepInEx;
 using StationeersMods.Interface;
 using StationeersMods.Shared;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Assets.Scripts.UI;
 using HarmonyLib;
-using StationeersMods.Cecil;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -54,9 +56,72 @@ namespace StationeersMods.Plugin
                     }
                     Init();
                 }
+
+                if (Scene.name.ToLower().Equals("base"))
+                {
+                    StartCoroutine(versionCheck());
+                }
             };
         }
 
+        public IEnumerator versionCheck()
+        {
+            Log("Checking for StationeersMods version...");
+
+            // Perform simple web request to get the latest version from github
+            using (var webRequest = UnityWebRequest.Get("https://api.github.com/repos/jixxed/StationeersMods/releases/latest"))
+            {
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.result == UnityWebRequest.Result.Success)
+                {
+                    Regex rx = new Regex(@"""tag_name""\:\s""([V\d.]*)""",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    
+                    MatchCollection matches = rx.Matches(webRequest.downloadHandler.text);
+                    if(matches.Count > 0)
+                    {
+                        var @group = matches[0].Groups[1];
+                        string currentVersion = @group.Value;
+                        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                        System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+                        string version = "V" + fvi.FileVersion;
+                        Log($"Latest StationeersMods version is {currentVersion}. Installed {version}");
+
+                        // If the current version is the same as the latest one, just exit the coroutine.
+                        if (version.ToLower().Equals(currentVersion.ToLower()))
+                            yield break;
+
+                        Log("New version of StationeersMods is available!");
+                        AlertPanel.Instance.ShowAlert($"New version of StationeersMods: ({currentVersion}) is available!", AlertState.Alert);
+                    }
+                    else
+                    {
+                        Debug.LogError(
+                            $"Failed to request latest StationeersMods version. Result: {webRequest.result} Error: '\"{webRequest.error}\""
+                        );
+                        Debug.LogError("Failed to check latest StationeersMods version!\n");
+                    }
+                }
+                else
+                {
+                    Debug.LogError(
+                        $"Failed to request latest StationeersMods version. Result: {webRequest.result} Error: '\"{webRequest.error}\""
+                    );
+                    Debug.LogError("Failed to check latest StationeersMods version!\n");
+
+                    // Wait for the alert window to close
+                    while (AlertPanel.Instance.AlertWindow.activeInHierarchy)
+                        yield return null;
+                }
+            }
+        }
+
+        private void Log(string message)
+        {
+            Debug.Log($"[StationeersMods] {message}");
+        }
+        
         public void Init()
         {
             var mm = ModManager.instance;

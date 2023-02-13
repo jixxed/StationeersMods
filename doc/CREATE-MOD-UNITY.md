@@ -8,6 +8,7 @@ Download the [ExampleMod](ExampleMod.zip). This contains a working starter mod y
 
 - Extract the zip into a project folder (ex. ExampleMod)
 - In Assets/Assemblies there is a README. This contains a list of dll's you need to copy over.
+- In Assets/StationeersMods is the exporter plugin for Unity. You should update this with the latest version of StationeersMods-exporter.zip from [Github](https://github.com/jixxed/StationeersMods/releases).
 - Open the folder in the Unity Hub and open the project.
 
 If the project fails to compile you will get an error:
@@ -21,6 +22,16 @@ Once the project is imported you can check the asmdef in the Scripts folder. it 
 
 ![Image](asmdef.png)
 
+### TMP Fix
+The game uses TextMeshPro. This requires a package in Unity. There is a bug in the TMP Code you can patch by replacing 2 files in: %localappdata%\Unity\cache\packages\packages.unity.com\com.unity.textmeshpro@3.0.6\Scripts\Runtime
+
+You can get the files from [TMP_Fix.zip](TMP_Fix.zip).
+
+The TextMeshPro package requirement is included in the project definition, so after the project is opened in Unity, the package is automatically downloaded and the folder above should become available.
+
+**This is a one time patch**, since every new project will use the files from that location.
+
+### Building the project
 To build the mod you can open the exporter from the menu
 
 ![Image](export_menu.png)
@@ -34,7 +45,7 @@ Fill in the settings:
 - **Include Content:** Content to include. For this example it will be `Everything`
 - **Startup Type:** Type of startup class. For this example it will be `Code`
 - **Startup class:** Name of the startup class
-- **Output Directory:** Description for your mod
+- **Output Directory:** Description for your mod (set this to your local mods folder: C:\Users\\[USERNAME]\Documents\My Games\Stationeers\mods)
 
 ![Image](export_settings1.png)
 
@@ -46,7 +57,7 @@ Back on the Export tab you can click export and your mod should be built into th
 
 ## Testing
 
-Copy the mod over to the local mods folder (Documents\My Games\Stationeers\mods)
+Copy the mod over to the local mods folder (C:\Users\\[USERNAME]\Documents\My Games\Stationeers\mods) if you did not set it as the output directory.
 
 Start the game and check the logs. This example mod writes a `Hello World!` to the log.
 
