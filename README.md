@@ -18,7 +18,16 @@ StationeersMods is a Bepinex plugin, so it is installed just like any other. Sta
 
 If you have questions you can ask them on [Discord](https://discord.gg/AEmQR3XCGm).
 
-## Mod Development (WIP)
+## Mod Development
+
+There are multiple flavors of mods supported:
+- unity mod: create anything you want in the game. New components with your own 3d models. (Requires unity)
+- simple mod: a simple mod like Bepinex or Addons. Create an simple patching mod and and compile. (Use Visual Studio or Rider)
+- bepinex mod: StationeersMods can automatically load bepinex mods from the workshop. Mods need to add a blank About\bepinex file to indicate this mod loads properly with StationeersMods.  
+
+for both the unity and simple mods, tutorials and examples are provided in the doc folder. Image overlays are available to indicate clearly to the user that the mod will we loaded with StationeersMods.
+
+### Manual project setup for unity mod (doc guide and example preferred, so only continue reading if you really want to)
 
 To create mods in unity you can use the StationeersMods Exporter.
 - Download the latest `StationeersMods-exporter.zip` from [Releases](https://github.com/jixxed/StationeersMods/releases)

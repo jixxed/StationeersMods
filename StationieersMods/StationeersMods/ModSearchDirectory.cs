@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
 
 namespace StationeersMods
 {
@@ -87,13 +88,20 @@ namespace StationeersMods
         {
             Thread.CurrentThread.IsBackground = true;
 
-            refreshEvent.WaitOne();
-
-            while (!disposed)
+            try
             {
-                DoRefresh();
-
                 refreshEvent.WaitOne();
+
+                while (!disposed)
+                {
+                    DoRefresh();
+
+                    refreshEvent.WaitOne();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
             }
         }
 
@@ -107,12 +115,12 @@ namespace StationeersMods
 
             foreach (var path in _modPaths.Keys.ToArray())
             {
-                if (!modInfoPaths.Contains(path))
-                {
-                    changed = true;
-                    RemoveModPath(path);
-                    continue;
-                }
+                // if (!modInfoPaths.Contains(path))
+                // {
+                //     changed = true;
+                //     RemoveModPath(path);
+                //     continue;
+                // }
 
                 var modDirectory = new DirectoryInfo(Path.GetDirectoryName(path));
 
@@ -194,7 +202,13 @@ namespace StationeersMods
 
         private string[] GetModInfoPaths()
         {
-            return Directory.GetFiles(path, "*.info", SearchOption.AllDirectories);
+            string[] paths = Directory.GetFiles(path, "*.info", SearchOption.AllDirectories);
+            if (paths.Length == 0)
+            {
+                paths = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
+            }
+
+            return paths;
         }
     }
 }

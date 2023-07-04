@@ -133,15 +133,15 @@ namespace StationeersMods.Plugin
                 Debug.Log("Mods changed.");
                 foreach (var mod in mm.mods)
                     Debug.Log(
-                        $"{mod.name}: {mod.assemblyNames.Count} assemblies, {mod.contentHandler.prefabs.Count} prefabs, isValid={mod.isValid}, state {mod.loadState}");
+                        $"{mod.name}: {mod.assemblyNames.Count} assemblies, {(mod is Mod m ? m.contentHandler.prefabs.Count : 0)} prefabs, isValid={mod.isValid}, state {mod.loadState}");
             };
 
             mm.ModFound += mod =>
             {
                 Debug.Log(
-                    $"Mod found: {mod.name} {mod.assemblyNames.Count} assemblies, {mod.contentHandler.prefabs.Count} prefabs, isValid={mod.isValid}, state {mod.loadState}");
-                if (mod.assetPaths != null)
-                    foreach (var assetPath in mod.assetPaths)
+                    $"Mod found: {mod.name} {mod.assemblyNames.Count} assemblies, {(mod is Mod m ? m.contentHandler.prefabs.Count : 0)} prefabs, isValid={mod.isValid}, state {mod.loadState}");
+                if (mod is Mod modm && modm.assetPaths != null)
+                    foreach (var assetPath in modm.assetPaths)
                         Debug.Log($" - {assetPath}");
 
                 mod.Load();
@@ -149,15 +149,17 @@ namespace StationeersMods.Plugin
                 mod.Loaded += resource => { Debug.Log($"Resource loaded? {resource.loadState} - {resource.name}"); };
 
                 Debug.Log(
-                    $"Mod loaded?: {mod.name} {mod.assemblyNames.Count} assemblies, {mod.contentHandler.prefabs.Count} prefabs, isValid={mod.isValid}, state {mod.loadState}");
+                    $"Mod loaded?: {mod.name} {mod.assemblyNames.Count} assemblies, {(mod is Mod m2 ? m2.contentHandler.prefabs.Count : 0)} prefabs, isValid={mod.isValid}, state {mod.loadState}");
             };
 
-            mm.ModLoaded += mod =>
+            mm.ModLoaded += assmod =>
             {
-                Debug.Log($"{mod.name} loaded. Looking for ExportSettings.");
-                var settings = mod.GetAsset<ExportSettings>("ExportSettings");
+                Debug.Log($"{assmod.name} loaded. Looking for ExportSettings.");
+                if (assmod is Mod mod)
+                {
+                    var settings = mod.GetAsset<ExportSettings>("ExportSettings");
 
-                if (settings != null)
+                    if (settings != null)
                 {
                     if (settings.StartupPrefab != null)
                     {
@@ -202,12 +204,13 @@ namespace StationeersMods.Plugin
                         }
                     }
                 }
+            }
                 else
                 {
                     var type = typeof(ModBehaviour);
-                    if (mod.assemblyFiles.Any())
+                    if (assmod.assemblyFiles.Any())
                     {
-                        mod.assemblyFiles.ForEach(path =>
+                        assmod.assemblyFiles.ForEach(path =>
                         {
                             Assembly modAssembly = Assembly.LoadFrom(path);
                             var types = modAssembly.GetTypes()
@@ -219,9 +222,27 @@ namespace StationeersMods.Plugin
                                 gameObj.AddComponent(t);
                                 gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                                 {
-                                    i.contentHandler = mod.contentHandler;
-                                    i.OnLoaded(mod.contentHandler);
+                                    i.contentHandler = ((Mod)assmod).contentHandler;
+                                    i.OnLoaded( ((Mod)assmod).contentHandler);
                                 });
+                            }
+                            //bepinex loading attempt
+                            if (!types.Any())
+                            {
+                                var type = typeof(BaseUnityPlugin);
+                                var types2 = modAssembly.GetTypes()
+                                    .Where(p => type.IsAssignableFrom(p));
+                                foreach (Type t in types2)
+                                {
+                                    GameObject gameObj = new GameObject();
+                                    Debug.Log("StationeersMods found BepinEx class: " + t.Name);
+                                    gameObj.AddComponent(t);
+                                    // gameObj.GetComponents<BaseUnityPlugin>().ToList().ForEach(i =>
+                                    // {
+                                    //     i.contentHandler = mod.contentHandler;
+                                    //     i.OnLoaded(mod.contentHandler);
+                                    // });
+                                }
                             }
                         });
                     }

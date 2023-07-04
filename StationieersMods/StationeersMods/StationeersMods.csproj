@@ -51,6 +51,7 @@
   <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
   <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
+    <Compile Include="AssemblyMod.cs" />
     <Compile Include="AssetBundleResource.cs" />
     <Compile Include="Dispatcher.cs" />
     <Compile Include="ModManager.cs" />

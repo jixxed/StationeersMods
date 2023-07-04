@@ -14,7 +14,7 @@ namespace StationeersMods
         /// </summary>
         /// <param name="name">The scene's name</param>
         /// <param name="mod">The Mod this ModScene belongs to.</param>
-        public ModScene(string name, Mod mod) : base(name)
+        public ModScene(string name, AssemblyMod mod) : base(name)
         {
             this.mod = mod;
             scene = null;
@@ -28,7 +28,7 @@ namespace StationeersMods
         /// <summary>
         ///     The Mod this scene belongs to.
         /// </summary>
-        public Mod mod { get; }
+        public AssemblyMod mod { get; }
 
         /// <summary>
         ///     Can the scene be loaded? False if this scene's Mod is not loaded.
@@ -80,8 +80,9 @@ namespace StationeersMods
 
         protected override void OnLoaded()
         {
+            if(mod is Mod m)
             foreach (var modHandler in GetComponentsInScene<IModHandler>())
-                modHandler.OnLoaded(mod.contentHandler);
+                modHandler.OnLoaded(m.contentHandler);
 
             base.OnLoaded();
         }

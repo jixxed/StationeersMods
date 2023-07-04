@@ -34,13 +34,13 @@ namespace StationeersMods
     {
         private readonly object _lock = new object();
 
-        private Dictionary<string, Mod> _modPaths;
-        public Dictionary<GameObject, Mod> modMap;
-        private List<Mod> _mods;
+        private Dictionary<string, AssemblyMod> _modPaths;
+        public Dictionary<GameObject, AssemblyMod> modMap;
+        private List<AssemblyMod> _mods;
         private int _refreshInterval;
 
         private Dispatcher dispatcher;
-        private List<Mod> queuedRefreshMods;
+        private List<AssemblyMod> queuedRefreshMods;
 
         private static List<ModSearchDirectory> searchDirectories;
         private WaitForSeconds wait;
@@ -74,7 +74,7 @@ namespace StationeersMods
         /// <summary>
         ///     All mods that have been found in all search directories.
         /// </summary>
-        public ReadOnlyCollection<Mod> mods { get; private set; }
+        public ReadOnlyCollection<AssemblyMod> mods { get; private set; }
 
         /// <summary>
         ///     Occurs when the collection of Mods has changed.
@@ -84,27 +84,27 @@ namespace StationeersMods
         /// <summary>
         ///     Occurs when a Mod has been found.
         /// </summary>
-        public event Action<Mod> ModFound;
+        public event Action<AssemblyMod> ModFound;
 
         /// <summary>
         ///     Occurs when a Mod has been removed. The Mod will be marked invalid.
         /// </summary>
-        public event Action<Mod> ModRemoved;
+        public event Action<AssemblyMod> ModRemoved;
 
         /// <summary>
         ///     Occurs when a Mod has been loaded
         /// </summary>
-        public event Action<Mod> ModLoaded;
+        public event Action<AssemblyMod> ModLoaded;
 
         /// <summary>
         ///     Occurs when a Mod has been Unloaded
         /// </summary>
-        public event Action<Mod> ModUnloaded;
+        public event Action<AssemblyMod> ModUnloaded;
 
         /// <summary>
         ///     Occurs when a Mod has cancelled async loading
         /// </summary>
-        public event Action<Mod> ModLoadCancelled;
+        public event Action<AssemblyMod> ModLoadCancelled;
 
         /// <summary>
         ///     Occurs when a ModScene has been loaded
@@ -130,9 +130,9 @@ namespace StationeersMods
 
             dispatcher = Dispatcher.instance;
 
-            _mods = new List<Mod>();
-            _modPaths = new Dictionary<string, Mod>();
-            queuedRefreshMods = new List<Mod>();
+            _mods = new List<AssemblyMod>();
+            _modPaths = new Dictionary<string, AssemblyMod>();
+            queuedRefreshMods = new List<AssemblyMod>();
             searchDirectories = new List<ModSearchDirectory>();
 
             mods = _mods.AsReadOnly();
@@ -198,6 +198,12 @@ namespace StationeersMods
                     if (File.Exists(item.DirectoryPath + "\\About\\stationeersmods"))
                     {
                         Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " +
+                                  item.Title);
+                        AddSearchDirectory(item.DirectoryPath);
+                    }
+                    if (File.Exists(item.DirectoryPath + "\\About\\bepinex"))
+                    {
+                        Debug.Log("BepInEx mod found in directory: " + item.DirectoryPath + ". name: " +
                                   item.Title);
                         AddSearchDirectory(item.DirectoryPath);
                     }
@@ -307,13 +313,13 @@ namespace StationeersMods
         {
             if (ModLoaded != null)
             {
-                ModLoaded.Invoke((Mod) mod);
+                ModLoaded.Invoke((AssemblyMod) mod);
             }
         }
 
         private void OnModUnloaded(Resource mod)
         {
-            var _mod = (Mod) mod;
+            var _mod = (AssemblyMod) mod;
 
             if (ModUnloaded != null)
                 ModUnloaded.Invoke(_mod);
@@ -321,14 +327,15 @@ namespace StationeersMods
             if (queuedRefreshMods.Contains(_mod))
             {
                 queuedRefreshMods.Remove(_mod);
-                OnModChanged(_mod.modInfo.path);
+                if(_mod is Mod modm)
+                OnModChanged(modm.modInfo.path);
             }
         }
 
         private void OnModLoadCancelled(Resource mod)
         {
             if (ModLoadCancelled != null)
-                ModLoadCancelled.Invoke((Mod) mod);
+                ModLoadCancelled.Invoke((AssemblyMod) mod);
         }
 
         private void OnSceneLoaded(ModScene scene)
@@ -425,7 +432,7 @@ namespace StationeersMods
             OnModFound(path);
         }
 
-        private void QueueModRefresh(Mod mod)
+        private void QueueModRefresh(AssemblyMod mod)
         {
             if (queuedRefreshMods.Contains(mod))
                 return;
@@ -442,8 +449,8 @@ namespace StationeersMods
                 if (_modPaths.ContainsKey(path))
                     return;
             }
-
-            var mod = new Mod(path);
+            Debug.Log("creating new Mod from " + path);
+            var mod = (path.EndsWith(".info")) ? new Mod(path) : new AssemblyMod(path);
 
             lock (_lock)
             {
@@ -453,31 +460,40 @@ namespace StationeersMods
             dispatcher.Enqueue(() => AddMod(mod), true);
         }
 
-        private void AddMod(Mod mod)
+        private void AddMod(AssemblyMod mod)
         {
-            mod.Loaded += OnModLoaded;
-            mod.Unloaded += OnModUnloaded;
-            mod.LoadCancelled += OnModLoadCancelled;
-            mod.SceneLoaded += OnSceneLoaded;
-            mod.SceneUnloaded += OnSceneUnloaded;
-            mod.SceneLoadCancelled += OnSceneLoadCancelled;
+            try
+            {
+                mod.Loaded += OnModLoaded;
+                mod.Unloaded += OnModUnloaded;
+                mod.LoadCancelled += OnModLoadCancelled;
+                if(mod is Mod modm)
+                {
+                    modm.SceneLoaded += OnSceneLoaded;
+                    modm.SceneUnloaded += OnSceneUnloaded;
+                    modm.SceneLoadCancelled += OnSceneLoadCancelled;
+                }
+                mod.UpdateConflicts(_mods);
+                foreach (var other in _mods)
+                    other.UpdateConflicts(mod);
 
-            mod.UpdateConflicts(_mods);
-            foreach (var other in _mods)
-                other.UpdateConflicts(mod);
+                LogUtility.LogInfo("Mod found: " + mod.name + " - " + mod.contentType);
+                _mods.Add(mod);
 
-            LogUtility.LogInfo("Mod found: " + mod.name + " - " + mod.contentType);
-            _mods.Add(mod);
-
-            ModFound?.Invoke(mod);
-            ModsChanged?.Invoke();
+                ModFound?.Invoke(mod);
+                ModsChanged?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         private void RemoveMod(string path)
         {
             lock (_lock)
             {
-                Mod mod;
+                AssemblyMod mod;
 
                 if (_modPaths.TryGetValue(path, out mod))
                 {
@@ -494,14 +510,18 @@ namespace StationeersMods
             }
         }
 
-        private void RemoveMod(Mod mod)
+        private void RemoveMod(AssemblyMod mod)
         {
             mod.Loaded -= OnModLoaded;
             mod.Unloaded -= OnModUnloaded;
             mod.LoadCancelled -= OnModLoadCancelled;
-            mod.SceneLoaded -= OnSceneLoaded;
-            mod.SceneUnloaded -= OnSceneUnloaded;
-            mod.SceneLoadCancelled -= OnSceneLoadCancelled;
+            
+            if(mod is Mod modm)
+            {
+                modm.SceneLoaded -= OnSceneLoaded;
+                modm.SceneUnloaded -= OnSceneUnloaded;
+                modm.SceneLoadCancelled -= OnSceneLoadCancelled;
+            }
             mod.SetInvalid();
 
             foreach (var other in _mods)
