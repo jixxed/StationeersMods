@@ -469,10 +469,16 @@ namespace StationeersMods
                 mod.LoadCancelled += OnModLoadCancelled;
                 if(mod is Mod modm)
                 {
+                    LogUtility.LogInfo("Mod is Mod: " + mod.name);
                     modm.SceneLoaded += OnSceneLoaded;
                     modm.SceneUnloaded += OnSceneUnloaded;
                     modm.SceneLoadCancelled += OnSceneLoadCancelled;
                 }
+                else
+                {
+                    LogUtility.LogInfo("Mod is AssemblyMod: " + mod.name);
+                }
+
                 mod.UpdateConflicts(_mods);
                 foreach (var other in _mods)
                     other.UpdateConflicts(mod);

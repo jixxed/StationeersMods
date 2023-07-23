@@ -279,6 +279,7 @@ namespace StationeersMods
 
         protected override void PreUnLoadResources()
         {
+            Debug.Log("PreUnLoadResources " + this.name);
             contentHandler.Clear();
 
             _scenes.ForEach(s => s.Unload());
@@ -288,6 +289,7 @@ namespace StationeersMods
 
         protected override void UnloadResources()
         {
+            Debug.Log("UnloadResources " + this.name);
             base.UnloadResources();
             LogUtility.LogInfo("Unloading Resources Mod: " + name);
 
@@ -304,11 +306,13 @@ namespace StationeersMods
 
         private void OnSceneLoaded(Resource scene)
         {
+            Debug.Log("OnSceneLoaded " + this.name);
             SceneLoaded?.Invoke((ModScene) scene);
         }
 
         private void OnSceneLoadCancelled(Resource scene)
         {
+            Debug.Log("OnSceneLoadCancelled " + this.name);
             SceneLoadCancelled?.Invoke((ModScene) scene);
 
             if (!_scenes.Any(s => s.isBusy))
@@ -317,6 +321,7 @@ namespace StationeersMods
 
         private void OnSceneUnloaded(Resource scene)
         {
+            Debug.Log("OnSceneUnloaded " + this.name);
             SceneUnloaded?.Invoke((ModScene) scene);
 
             if (!_scenes.Any(s => s.isBusy))
@@ -325,6 +330,7 @@ namespace StationeersMods
 
         protected override void OnLoadResumed()
         {
+            Debug.Log("OnLoadResumed " + this.name);
             //resume scene loading
             foreach (var scene in _scenes)
                 if (scene.loadState == ResourceLoadState.Cancelling)
@@ -335,6 +341,7 @@ namespace StationeersMods
 
         protected override void OnLoaded()
         {
+            Debug.Log("OnLoaded " + this.name);
             foreach (var loader in GetInstances<IModHandler>())
                 loader.OnLoaded(contentHandler);
 

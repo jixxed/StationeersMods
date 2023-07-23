@@ -54,6 +54,7 @@ namespace StationeersMods.Plugin
                         Debug.LogError("Failed to initialize workshop publish patch.");
                         Debug.LogException(ex);
                     }
+
                     Init();
                 }
 
@@ -77,9 +78,9 @@ namespace StationeersMods.Plugin
                 {
                     Regex rx = new Regex(@"""tag_name""\:\s""([V\d.]*)""",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                    
+
                     MatchCollection matches = rx.Matches(webRequest.downloadHandler.text);
-                    if(matches.Count > 0)
+                    if (matches.Count > 0)
                     {
                         var @group = matches[0].Groups[1];
                         string currentVersion = @group.Value;
@@ -121,11 +122,11 @@ namespace StationeersMods.Plugin
         {
             Debug.Log($"[StationeersMods] {message}");
         }
-        
+
         public void Init()
         {
             var mm = ModManager.instance;
-            
+
             mm.RefreshSearchDirectories();
 
             mm.ModsChanged += () =>
@@ -158,53 +159,79 @@ namespace StationeersMods.Plugin
                 if (assmod is Mod mod)
                 {
                     var settings = mod.GetAsset<ExportSettings>("ExportSettings");
-
                     if (settings != null)
-                {
-                    if (settings.StartupPrefab != null)
                     {
-                        Debug.Log("StationeersMods starting with prefab: " + settings.StartupPrefab);
-                        // We want to defer this logic to after the gameprefabs have been loaded.
-                        var gobj = Instantiate(settings.StartupPrefab);
-                        Object.DontDestroyOnLoad(gobj);
-                        gobj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
+                        Debug.Log($"{assmod.name} - prefab {settings.StartupPrefab} - class {settings.StartupClass}");
+                        if (settings.StartupPrefab != null)
                         {
-                            i.contentHandler = mod.contentHandler;
-                            i.OnLoaded(mod.contentHandler);
-                        });
-                    }
-
-                    if (settings.StartupClass != null)
-                    {
-                        Debug.Log("StationeersMods starting with class: " + settings.StartupClass);
-                        GameObject gameObj = new GameObject();
-                        System.Type scriptType = System.Type.GetType(settings.StartupClass);
-                        if (scriptType == null)
-                        {
-                            Debug.Log("starting class not available, looking through assemblies");
-                            foreach (Assembly a in System.AppDomain.CurrentDomain.GetAssemblies())
-                            {
-                                var tempType = a.GetType(settings.StartupClass);
-                                if (tempType != null)
-                                {
-                                    scriptType = tempType;
-                                }
-                            }
-                        }
-
-                        if (scriptType != null)
-                        {
-                            Debug.Log("StationeersMods found class: " + settings.StartupClass);
-                            gameObj.AddComponent(scriptType);
-                            gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
+                            Debug.Log("(Settings)StationeersMods starting with prefab: " + settings.StartupPrefab);
+                            // We want to defer this logic to after the gameprefabs have been loaded.
+                            var gobj = Instantiate(settings.StartupPrefab);
+                            Object.DontDestroyOnLoad(gobj);
+                            gobj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                             {
                                 i.contentHandler = mod.contentHandler;
                                 i.OnLoaded(mod.contentHandler);
                             });
                         }
+
+                        if (settings.StartupClass != null)
+                        {
+                            Debug.Log("(Settings)StationeersMods starting with class: " + settings.StartupClass);
+                            GameObject gameObj = new GameObject();
+                            System.Type scriptType = System.Type.GetType(settings.StartupClass);
+                            if (scriptType == null)
+                            {
+                                Debug.Log("(Settings)starting class not available, looking through assemblies");
+                                foreach (Assembly a in System.AppDomain.CurrentDomain.GetAssemblies())
+                                {
+                                    var tempType = a.GetType(settings.StartupClass);
+                                    if (tempType != null)
+                                    {
+                                        scriptType = tempType;
+                                    }
+                                }
+                            }
+
+                            if (scriptType != null)
+                            {
+                                Debug.Log("(Settings)StationeersMods found class: " + settings.StartupClass);
+                                gameObj.AddComponent(scriptType);
+                                gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
+                                {
+                                    i.contentHandler = mod.contentHandler;
+                                    i.OnLoaded(mod.contentHandler);
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var type = typeof(ModBehaviour);
+                        assmod.assemblyFiles.ForEach(assfile => Debug.Log(assfile));
+                        if (assmod.assemblyFiles.Any())
+                        {
+                            assmod.assemblyFiles.ForEach(path =>
+                            {
+                                Debug.Log("Load assembly from: " + path);
+                                Assembly modAssembly = Assembly.LoadFrom(path);
+                                var types = modAssembly.GetTypes()
+                                    .Where(p => type.IsAssignableFrom(p));
+                                foreach (Type t in types)
+                                {
+                                    GameObject gameObj = new GameObject();
+                                    Debug.Log("(Settings)StationeersMods found class: " + t.Name);
+                                    gameObj.AddComponent(t);
+                                    gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
+                                    {
+                                        i.contentHandler = ((Mod) assmod).contentHandler;
+                                        i.OnLoaded(((Mod) assmod).contentHandler);
+                                    });
+                                }
+                            });
+                        }
                     }
                 }
-            }
                 else
                 {
                     var type = typeof(ModBehaviour);
@@ -212,6 +239,7 @@ namespace StationeersMods.Plugin
                     {
                         assmod.assemblyFiles.ForEach(path =>
                         {
+                            Debug.Log("Load assembly from: " + path);
                             Assembly modAssembly = Assembly.LoadFrom(path);
                             var types = modAssembly.GetTypes()
                                 .Where(p => type.IsAssignableFrom(p));
@@ -222,10 +250,11 @@ namespace StationeersMods.Plugin
                                 gameObj.AddComponent(t);
                                 gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                                 {
-                                    i.contentHandler = ((Mod)assmod).contentHandler;
-                                    i.OnLoaded( ((Mod)assmod).contentHandler);
+                                    i.contentHandler = ((Mod) assmod).contentHandler;
+                                    i.OnLoaded(((Mod) assmod).contentHandler);
                                 });
                             }
+
                             //bepinex loading attempt
                             if (!types.Any())
                             {
