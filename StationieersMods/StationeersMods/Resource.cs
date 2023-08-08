@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
+using System.Linq;
+using Assets.Scripts.Serialization;
 using StationeersMods.Interface;
+using UnityEngine;
 
 namespace StationeersMods
 {
@@ -13,12 +17,14 @@ namespace StationeersMods
 
         private LoadState _loadState;
 
+        public String modDirectory { get; protected set; }
         /// <summary>
         ///     Initialize a Resource with a name.
         /// </summary>
         /// <param name="name">The Resource's name</param>
-        protected Resource(string name)
+        protected Resource(string name, string modDirectory)
         {
+            this.modDirectory = modDirectory;
             this.name = name;
             _loadState = new UnloadedState(this);
         }
@@ -113,7 +119,17 @@ namespace StationeersMods
         /// </summary>
         public IEnumerator LoadCoroutine()
         {
-            yield return _loadState.Load();
+            //only load if mods are enabled
+            ModConfig config = !File.Exists("modconfig.xml")
+                ? new ModConfig()
+                : (PlayerPrefs.GetInt("updated-mod-config", 0) == 1 ? XmlSerialization.Deserialize<ModConfig>("modconfig.xml", "") : ModConfigUpgrader.Upgrade("modconfig.xml"));
+            if (config.Mods.Any(modData => !String.Empty.Equals(modData.LocalPath) && String.Compare(
+                                                                  Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
+                                                                  Path.GetFullPath(modDirectory).TrimEnd('\\'),
+                                                                  StringComparison.InvariantCultureIgnoreCase) == 0 && modData.IsEnabled))
+            {
+                yield return _loadState.Load();
+            }
         }
 
         /// <summary>

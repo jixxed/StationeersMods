@@ -32,14 +32,14 @@ namespace StationeersMods
         ///     Initialize a new Mod with a path to a mod file.
         /// </summary>
         /// <param name="path">The path to a mod file</param>
-        public AssemblyMod(string path) : base(Path.GetFileNameWithoutExtension(path))
+        public AssemblyMod(string path) : base(Path.GetFileNameWithoutExtension(path), Path.GetDirectoryName(path))
         {
             // modInfo = ModInfo.Load(path);
 
             // contentType = modInfo.content;
             // contentTypes = modInfo.contentTypes;
 
-            var modDirectory = Path.GetDirectoryName(path);
+            modDirectory = Path.GetDirectoryName(path);
             // var platformDirectory = Path.Combine(modDirectory, Application.platform.GetModPlatform().ToString());
             assemblyFiles = AssemblyUtility.GetAssemblies(modDirectory, AssemblyFilter.ModAssemblies);
             // if (contentTypes.HasFlag(ContentType.scenes))

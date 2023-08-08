@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO;
 using StationeersMods.Interface;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +15,7 @@ namespace StationeersMods
         /// </summary>
         /// <param name="name">The scene's name</param>
         /// <param name="mod">The Mod this ModScene belongs to.</param>
-        public ModScene(string name, AssemblyMod mod) : base(name)
+        public ModScene(string name, AssemblyMod mod, string path) : base(name, path)
         {
             this.mod = mod;
             scene = null;
