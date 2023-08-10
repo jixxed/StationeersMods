@@ -123,13 +123,26 @@ namespace StationeersMods
             ModConfig config = !File.Exists("modconfig.xml")
                 ? new ModConfig()
                 : (PlayerPrefs.GetInt("updated-mod-config", 0) == 1 ? XmlSerialization.Deserialize<ModConfig>("modconfig.xml", "") : ModConfigUpgrader.Upgrade("modconfig.xml"));
-            if (config.Mods.Any(modData => !String.Empty.Equals(modData.LocalPath) && String.Compare(
-                                                                  Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
-                                                                  Path.GetFullPath(modDirectory).TrimEnd('\\'),
-                                                                  StringComparison.InvariantCultureIgnoreCase) == 0 && modData.IsEnabled))
+            if (hasNoModConfig(config) || hasModConfigAndIsEnabled(config))
             {
                 yield return _loadState.Load();
             }
+        }
+
+        private bool hasNoModConfig(ModConfig config)
+        {
+            return config.Mods.Count == 0 || config.Mods.All(modData => String.Empty.Equals(modData.LocalPath) || String.Compare(
+                Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
+                Path.GetFullPath(modDirectory).TrimEnd('\\'),
+                StringComparison.InvariantCultureIgnoreCase) != 0);
+        }
+
+        private bool hasModConfigAndIsEnabled(ModConfig config)
+        {
+            return config.Mods.Any(modData => !String.Empty.Equals(modData.LocalPath) && String.Compare(
+                Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
+                Path.GetFullPath(modDirectory).TrimEnd('\\'),
+                StringComparison.InvariantCultureIgnoreCase) == 0 && modData.IsEnabled);
         }
 
         /// <summary>
