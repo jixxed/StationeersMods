@@ -32,6 +32,8 @@ namespace StationeersMods.Shared
 
         [SerializeField] private ContentType _contentTypes;
 
+        [SerializeField] private bool _includePdbs;
+
         [SerializeField] private BootType _bootType;
 
         [SerializeField] private GameObject _startupPrefab;
@@ -87,6 +89,8 @@ namespace StationeersMods.Shared
         public string OutputDirectory { get => _outputDirectory; set => _outputDirectory = value; }
 
         public ContentType ContentTypes { get => _contentTypes; set => _contentTypes =value;}
+
+        public bool IncludePdbs { get => _includePdbs; set => _includePdbs = value; }
 
         public BootType BootType { get => _bootType; set => _bootType =value;}
 

@@ -70,15 +70,27 @@ namespace StationeersMods.Editor
                 var asmDef = JsonUtility.FromJson<AsmDef>(json);
 
                 var modAsmPath = Path.Combine("Library", "ScriptAssemblies", $"{asmDef.name}.dll");
+                var modPdbPath = Path.Combine("Library", "ScriptAssemblies", $"{asmDef.name}.pdb");
 
                 if (!File.Exists(modAsmPath))
                 {
-                    LogUtility.LogError($"{asmDef.name} not found: {modAsmPath}");
+                    LogUtility.LogError($"{asmDef.name}.dll not found: {modAsmPath}");
+                    continue;
+                }
+
+                if (settings.IncludePdbs && !File.Exists(modPdbPath))
+                {
+                    LogUtility.LogError($"{asmDef.name}.pdb not found: {modPdbPath}");
                     continue;
                 }
 
                 LogUtility.LogDebug($" - {asmDef.name}");
                 File.Copy(modAsmPath, Path.Combine(tempModDirectory, $"{asmDef.name}.dll"));
+
+                if (settings.IncludePdbs)
+                {
+                    File.Copy(modPdbPath, Path.Combine(tempModDirectory, $"{asmDef.name}.pdb"));
+                }
             }
         }
 

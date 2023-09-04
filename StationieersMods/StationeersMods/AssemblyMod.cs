@@ -189,7 +189,7 @@ namespace StationeersMods
 
                 try
                 {
-                    var assembly = Assembly.Load(File.ReadAllBytes(path));
+                    var assembly = Assembly.LoadFrom(path);
                     assembly.GetTypes();
                     assemblies.Add(assembly);
                 }
