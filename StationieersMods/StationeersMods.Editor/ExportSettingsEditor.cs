@@ -22,6 +22,7 @@ namespace StationeersMods.Editor
         private SerializedProperty _description;
         private SerializedProperty _name;
         private SerializedProperty _outputDirectory;
+        private SerializedProperty _includePdbs;
         private SerializedProperty _version;
         private SerializedProperty _prefab;
         private SerializedProperty _scene;
@@ -39,6 +40,7 @@ namespace StationeersMods.Editor
             _description = serializedObject.FindProperty("_description");
             _version = serializedObject.FindProperty("_version");
             _outputDirectory = serializedObject.FindProperty("_outputDirectory");
+            _includePdbs = serializedObject.FindProperty("_includePdbs");
             _prefab = serializedObject.FindProperty("_startupPrefab");
             _scene = serializedObject.FindProperty("_startupScene");
             _class = serializedObject.FindProperty("_startupClass");
@@ -204,6 +206,11 @@ namespace StationeersMods.Editor
             LogUtility.logLevel = (LogLevel)EditorGUILayout.EnumPopup("Log Level:", LogUtility.logLevel);
         }
 
+        private void DrawPdbSelector()
+        {
+            _includePdbs.boolValue = EditorGUILayout.Toggle("Include PDBs:", _includePdbs.boolValue);
+        }
+
         private void DrawAssemblySelector()
         {
             DrawSection(() =>
@@ -226,6 +233,7 @@ namespace StationeersMods.Editor
         {
             DrawSection(() => {
                 DrawLogSelector();
+                DrawPdbSelector();
                 DrawDirectorySelector();
             });
         }

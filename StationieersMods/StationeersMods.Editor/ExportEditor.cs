@@ -75,6 +75,11 @@ namespace StationeersMods.Editor
             }
         }
 
+        private void DrawPdbSelector(ExportSettings settings)
+        {
+            settings.IncludePdbs = EditorGUILayout.Toggle("Include PDBs:", settings.IncludePdbs);
+        }
+
         private void DrawBootSelector(ExportSettings settings)
         {
             var content = settings.ContentTypes;
@@ -183,6 +188,7 @@ namespace StationeersMods.Editor
         {
             DrawSection(() => {
                 DrawLogSelector();
+                DrawPdbSelector(settings);
                 DrawDirectorySelector(settings);
             });
         }
