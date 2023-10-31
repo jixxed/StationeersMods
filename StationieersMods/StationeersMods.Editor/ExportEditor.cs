@@ -77,6 +77,7 @@ namespace StationeersMods.Editor
 
         private void DrawPdbSelector(ExportSettings settings)
         {
+            EditorGUILayout.LabelField("You can include a debug database. You might want to exclude it once you publish, since it is of no use to end users.");
             settings.IncludePdbs = EditorGUILayout.Toggle("Include PDBs:", settings.IncludePdbs);
         }
 
