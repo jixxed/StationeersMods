@@ -131,7 +131,7 @@ namespace StationeersMods
 
         private bool hasNoModConfig(ModConfig config)
         {
-            return config.Mods.Count == 0 || config.Mods.All(modData => String.Empty.Equals(modData.LocalPath) || String.Compare(
+            return config.Mods.Count == 0 || config.Mods.All(modData => String.IsNullOrEmpty(modData.LocalPath) || String.Compare(
                 Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
                 Path.GetFullPath(modDirectory).TrimEnd('\\'),
                 StringComparison.InvariantCultureIgnoreCase) != 0);
@@ -139,7 +139,7 @@ namespace StationeersMods
 
         private bool hasModConfigAndIsEnabled(ModConfig config)
         {
-            return config.Mods.Any(modData => !String.Empty.Equals(modData.LocalPath) && String.Compare(
+            return config.Mods.Any(modData => !String.IsNullOrEmpty(modData.LocalPath) && String.Compare(
                 Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
                 Path.GetFullPath(modDirectory).TrimEnd('\\'),
                 StringComparison.InvariantCultureIgnoreCase) == 0 && modData.IsEnabled);

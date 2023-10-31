@@ -133,3 +133,7 @@ Inside you'll find:
 ### Installing Assetmods
 
 Installing assetmods are as easy as dropping them into your `%userprofile%\Documents\My Games\Stationeers\mods\` folder.
+
+## Building this solution
+
+If you are going to build the solution, be sure to look at `StationeersMods.VS.props`, setting those two properties will make it so the package builds without having to track down all of the dependencies manually (In Visual Studio)
