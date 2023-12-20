@@ -25,5 +25,17 @@ namespace StationeersMods.Plugin
         [XmlArray("Tags")]
         [XmlArrayItem("Tag")]
         public List<string> Tags;
+       
+        [XmlArray("Dependencies")]
+        [XmlArrayItem("Mod")]
+        public List<ModVersion> Dependencies;
+        
+        [XmlArray("LoadBefore")]
+        [XmlArrayItem("Mod")]
+        public List<ModVersion> LoadBefore;
+        
+        [XmlArray("LoadAfter")]
+        [XmlArrayItem("Mod")]
+        public List<ModVersion> LoadAfter;
     }
 }

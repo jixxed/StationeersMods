@@ -53,8 +53,12 @@
   <ItemGroup>
     <Compile Include="AssemblyMod.cs" />
     <Compile Include="AssetBundleResource.cs" />
+    <Compile Include="CustomModAbout.cs" />
+    <Compile Include="DependencyException.cs" />
     <Compile Include="Dispatcher.cs" />
+    <Compile Include="MissingDependencyException.cs" />
     <Compile Include="ModManager.cs" />
+    <Compile Include="ModVersion.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="ModSearchDirectory.cs" />
     <Compile Include="Mod.cs" />
@@ -64,6 +68,8 @@
     <Compile Include="ResourceLoadState.cs" />
     <Compile Include="SceneExtensions.cs" />
     <Compile Include="UnitySingleton.cs" />
+    <Compile Include="ValidationResult.cs" />
+    <Compile Include="VersionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
