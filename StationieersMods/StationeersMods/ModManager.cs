@@ -422,7 +422,14 @@ namespace StationeersMods
                 if (File.Exists(modData.AboutXmlPath))
                 {
                     var aboutData = XmlSerialization.Deserialize<CustomModAbout>(modData.AboutXmlPath, "ModMetadata");
-                    available.Add(new ModVersion(aboutData.Version, aboutData.WorkshopHandle));
+                    if( aboutData.Version != null)//version is a string and can be null
+                    {
+                        available.Add(new ModVersion(aboutData.Version, aboutData.WorkshopHandle));
+                    }
+                    else
+                    {
+                        available.Add(new ModVersion(aboutData.WorkshopHandle));
+                    }
                 }
             }
 

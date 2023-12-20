@@ -13,10 +13,12 @@ namespace StationeersMods.Plugin
             Version = version;
             Id = modId;
         }
-
-        public ModVersion()
+        
+        public ModVersion(ulong modId) : this("-1", modId)
         {
-            Version = "-1";
+        }
+        public ModVersion() : this(0UL)
+        {
         }
 
         public bool IsSame(in string version, in ulong modId)
