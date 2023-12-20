@@ -1,6 +1,6 @@
 # Defining dependencies and mod loading order
 
-StationeersMods allows you to define dependencies and load order in the About.xml file.About
+StationeersMods allows you to define dependencies and load order in the About.xml file. 
 It has the following formatting:
 ```
 <ModMetadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
