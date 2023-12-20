@@ -20,8 +20,10 @@ using Assets.Scripts.Util;
 using BepInEx;
 using Cysharp.Threading.Tasks;
 using HarmonyLib;
+using StationeersMods.Plugin;
 using StationeersMods.Shared;
 using Steamworks;
+using Steamworks.Data;
 using Steamworks.Ugc;
 using UnityEngine;
 
@@ -147,25 +149,284 @@ namespace StationeersMods
             AddLocalAndWorkshopItems();
         }
 
+        // private static void LoadDataFiles()
+        // {
+        //     WorldManager.LoadDataFilesAtPath(Application.streamingAssetsPath + "/Data");
+        //     List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
+        //     for (int index = mods.Count - 1; index >= 0; --index)
+        //     {
+        //         ModData modData = mods[index];
+        //         if (!modData.IsCore && modData.IsEnabled)
+        //             WorldManager.LoadDataFilesAtPath(modData.LocalPath + "/GameData");
+        //     }
+        // }
         private static bool WorldManagerFix()
         {
+            initMods();
             List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
-            for (int index = mods.Count - 1; index >= 0; --index)
+            try
             {
-                ModData modData = mods[index];
-                if (!modData.IsCore && modData.IsEnabled)
+                validateModOrder();
+                for (int index = mods.Count - 1; index >= 0; --index)
                 {
-                    typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                        .Invoke(null, new[] {modData.LocalPath + "/GameData"});
+                    ModData modData = mods[index];
+                    if (!modData.IsCore && modData.IsEnabled)
+                    {
+                        typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                            .Invoke(null, new[] {modData.LocalPath + "/GameData"});
+                    }
+                    else if (modData.IsCore)
+                    {
+                        typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                            .Invoke(null, new[] {Application.streamingAssetsPath + "/Data"});
+                    }
                 }
-                else if (modData.IsCore)
-                {
-                    typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                        .Invoke(null, new[] {Application.streamingAssetsPath + "/Data"});
-                }
+            }
+            catch (MissingDependencyException ex)
+            {
+                //do not load mods
+                //log error
+                Debug.LogError(ex.Message);
+                PromptPanel.Instance.ShowPrompt("Missing dependencies detected", ex.Message, "Subscribe", () => SubscribeToMissingMods(ex.Missing));
+            }
+            catch (DependencyException ex)
+            {
+                //do not load mods
+                //log error
+                Debug.LogError(ex.Message);
+                AlertPanel.Instance.ShowAlert(ex.Message, AlertState.Alert);
             }
 
             return false;
+        }
+
+        private static async void SubscribeToMissingMods(List<ModVersion> missing)
+        {
+            List<UniTask<bool>> tasks = missing.Select(modVersion =>
+            {
+                Debug.Log("Try to subscribe to: " + modVersion.Id);
+                return SubscribeToMod(modVersion.Id);
+            }).ToList();
+            var results = await UniTask.WhenAll(tasks);
+
+            if (results.All(result => result == false))
+            {
+                AlertPanel.Instance.ShowAlert($"StationeersMods has failed to subscribe to all the listed mods. \nYou will need to remove the mods that fail to load.", AlertState.Alert);
+            }
+            else if (results.Any(result => result == false))
+            {
+                AlertPanel.Instance.ShowAlert($"StationeersMods has failed to subscribe to some of the listed mods. \nYou will need to remove the mods that fail to load. \nA restart of the game is required!", AlertState.Alert);
+            }
+            else
+            {
+                AlertPanel.Instance.ShowAlert($"StationeersMods has subscribed to all listed mods. \nA restart of the game is required!", AlertState.Alert);
+            }
+        }
+
+        private static UniTask<bool> SubscribeToMod(ulong modId)
+        {
+            object[] parameters = {modId};
+            UniTask<bool> task = (UniTask<bool>) typeof(SteamTransport).GetMethod("Workshop_SubscribeToItemAsync", BindingFlags.NonPublic | BindingFlags.Static)
+                .Invoke(null, parameters);
+            return task;
+        }
+
+        private static async void initMods()
+        {
+            foreach (SteamTransport.ItemWrapper localAndWorkshopItem in (IEnumerable<SteamTransport.ItemWrapper>) await NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod))
+            {
+                SteamTransport.ItemWrapper item = localAndWorkshopItem;
+                try
+                {
+                    if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.LocalPath != item.DirectoryPath)))
+                        WorkshopMenu.ModsConfig.Mods.Add(new ModData(item, true));
+                }
+                catch (Exception ex)
+                {
+                    ConsoleWindow.PrintError(string.Format("Error loading mod with id {0}", (object) item.Id), false);
+                    ConsoleWindow.PrintError(ex.Message, false);
+                }
+            }
+
+            SaveModConfig();
+        }
+
+        private static void validateModOrder()
+        {
+            ValidationResult validationResult = new ValidationResult();
+            do
+            {
+                //if any mod has been reordered > 50 times, there is likely a circular dependency and we can stop loading.
+                if (validationResult.ReorderCount.Values.Any(value => value > 50))
+                {
+                    throw new DependencyException("Mod loading failed. Circular dependency detected. (A load before B, B load before A)");
+                }
+
+                validationResult.Retry = false;
+                List<ModData> allMods = WorkshopMenu.ModsConfig.Mods;
+                List<ModVersion> availableMods = listAvailableMods();
+                Debug.Log("available mods: " + availableMods.Join((mod) => mod.ToString(), ","));
+
+                validateOrder(allMods, availableMods, validationResult);
+            } while (validationResult.Retry);
+
+            if (validationResult.NeedSave)
+            {
+                SaveModConfig();
+                AlertPanel.Instance.ShowAlert($"StationeersMods has updated the mod loading order. A restart of the game is required!", AlertState.Alert);
+            }
+        }
+
+        private static void validateOrder(List<ModData> allMods, List<ModVersion> availableMods, ValidationResult validationResult)
+        {
+            List<ModVersion> loadedMods = new List<ModVersion>();
+            for (int index = allMods.Count - 1; index >= 0; --index)
+            {
+                ModData modData = allMods[index];
+                if (modData.IsCore)
+                {
+                    loadedMods.Add(new ModVersion(VersionHelper.GameVersion(), 1UL));
+                    continue;
+                }
+
+                if (!File.Exists(modData.AboutXmlPath))
+                {
+                    //skip for mods with missing about.xml, because we can't determine workshop handle or load order
+                    continue;
+                }
+
+                var modAbout = XmlSerialization.Deserialize<CustomModAbout>(modData.AboutXmlPath, "ModMetadata");
+                validateDependencies(availableMods, modAbout);
+
+                if (checkModLoadAfter(availableMods, validationResult, modAbout, loadedMods, modData)) break;
+
+                if (checkModLoadBefore(validationResult, modAbout, loadedMods, modData)) break;
+
+                loadedMods.Add(new ModVersion(modAbout.Version, modAbout.WorkshopHandle));
+            }
+        }
+
+        private static bool checkModLoadBefore(ValidationResult validationResult, CustomModAbout modAbout, List<ModVersion> loadedMods, ModData modData)
+        {
+            var loadBefore = modAbout.LoadBefore;
+
+            // Debug.Log( "Mods to load before: " + loadBefore.Join((mod) => mod.ToString(), ","));
+            if (loadBefore.Any(beforeMod => loadedMods.Any(loadedMod => loadedMod.IsSame(beforeMod.Version, beforeMod.Id))))
+            {
+                //not all required dependencies have been listed after
+                loadBefore.FindAll(beforeMod => loadedMods.Any(loadedMod => loadedMod.IsSame(beforeMod.Version, beforeMod.Id))).ForEach(beforeMod =>
+                {
+                    var mod = WorkshopMenu.ModsConfig.Mods.Find(modx =>
+                    {
+                        if (beforeMod.Id == 1UL)
+                        {
+                            return modx.IsCore;
+                        }
+
+                        if (!File.Exists(modx.AboutXmlPath))
+                        {
+                            //skip for missing mods
+                            return false;
+                        }
+
+                        var aboutDatax = XmlSerialization.Deserialize<CustomModAbout>(modx.AboutXmlPath, "ModMetadata");
+                        return beforeMod.IsSame(aboutDatax.Version, aboutDatax.WorkshopHandle);
+                    });
+                    while (WorkshopMenu.ModsConfig.Mods.IndexOf(mod) > WorkshopMenu.ModsConfig.Mods.IndexOf(modData))
+                    {
+                        WorkshopMenu.ModsConfig.MoveModUp(mod);
+                    }
+                });
+                validationResult.ReorderCount[modAbout.WorkshopHandle] = validationResult.ReorderCount.GetValueOrDefault(modAbout.WorkshopHandle, 0) + 1;
+                validationResult.Retry = true;
+                validationResult.NeedSave = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool checkModLoadAfter(List<ModVersion> availableMods, ValidationResult validationResult, CustomModAbout modAbout, List<ModVersion> loadedMods, ModData modData)
+        {
+            var loadAfter = modAbout.LoadAfter;
+            // Debug.Log( "Mods to load after: " + loadAfter.Join((mod) => mod.ToString(), ","));
+            if (!loadAfter.TrueForAll(afterMod =>
+                !availableMods.Any(availableMod => availableMod.IsSame(afterMod.Version, afterMod.Id)) || loadedMods.Any(loadedMod => loadedMod.IsSame(afterMod.Version, afterMod.Id))))
+            {
+                //not all required dependencies have been listed before
+                loadAfter.FindAll(
+                        afterMod => availableMods.Any(availableMod => availableMod.IsSame(afterMod.Version, afterMod.Id)) &&
+                                    !loadedMods.Any(loadedMod => loadedMod.IsSame(afterMod.Version, afterMod.Id)))
+                    .ForEach(
+                        afterMod =>
+                        {
+                            var mod = WorkshopMenu.ModsConfig.Mods.Find(modx =>
+                            {
+                                if (afterMod.Id == 1UL)
+                                {
+                                    return modx.IsCore;
+                                }
+
+                                if (!File.Exists(modx.AboutXmlPath))
+                                {
+                                    //skip for missing mods
+                                    return false;
+                                }
+
+                                var aboutDatax = XmlSerialization.Deserialize<CustomModAbout>(modx.AboutXmlPath, "ModMetadata");
+                                return afterMod.IsSame(aboutDatax.Version, aboutDatax.WorkshopHandle);
+                            });
+                            while (WorkshopMenu.ModsConfig.Mods.IndexOf(mod) < WorkshopMenu.ModsConfig.Mods.IndexOf(modData))
+                            {
+                                WorkshopMenu.ModsConfig.MoveModDown(mod);
+                            }
+                        });
+                validationResult.ReorderCount[modAbout.WorkshopHandle] = validationResult.ReorderCount.GetValueOrDefault(modAbout.WorkshopHandle, 0) + 1;
+                validationResult.Retry = true;
+                validationResult.NeedSave = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static void validateDependencies(List<ModVersion> availableMods, CustomModAbout modAbout)
+        {
+            var dependencies = modAbout.Dependencies;
+            if (!dependencies.TrueForAll(modVersion => availableMods.Any(availableMod => availableMod.IsSame(modVersion.Version, modVersion.Id))))
+            {
+                //error - not all required dependencies are available
+                throw new MissingDependencyException("Mod loading failed due to missing dependency: Mod " + modAbout.Name + " requires the following missing mods with workshop handles [" +
+                                                     dependencies.FindAll(modVersion => !availableMods.Any(availableMod => availableMod.IsSame(modVersion.Version, modVersion.Id)))
+                                                         .Join((handle) => handle.ToString(), ",") + "]",
+                    dependencies.FindAll(modVersion => !availableMods.Any(availableMod => availableMod.IsSame(modVersion.Version, modVersion.Id))).ToList()
+                );
+            }
+        }
+
+        private static void SaveModConfig()
+        {
+            if (WorkshopMenu.ModsConfig == null || WorkshopMenu.ModsConfig.SaveXml<ModConfig>("modconfig.xml"))
+                return;
+            Debug.LogError((object) "Error saving modconfig.xml");
+        }
+
+        private static List<ModVersion> listAvailableMods()
+        {
+            List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
+            List<ModVersion> available = new List<ModVersion>();
+            available.Add(new ModVersion(VersionHelper.GameVersion(), 1UL)); //core mod
+            for (int index = mods.Count - 1; index >= 0; --index)
+            {
+                ModData modData = mods[index];
+                if (File.Exists(modData.AboutXmlPath))
+                {
+                    var aboutData = XmlSerialization.Deserialize<CustomModAbout>(modData.AboutXmlPath, "ModMetadata");
+                    available.Add(new ModVersion(aboutData.Version, aboutData.WorkshopHandle));
+                }
+            }
+
+            return available;
         }
 
         private async void AddLocalAndWorkshopItems()
@@ -201,6 +462,7 @@ namespace StationeersMods
                                   item.Title);
                         AddSearchDirectory(item.DirectoryPath);
                     }
+
                     if (File.Exists(item.DirectoryPath + "\\About\\bepinex"))
                     {
                         Debug.Log("BepInEx mod found in directory: " + item.DirectoryPath + ". name: " +
@@ -327,8 +589,8 @@ namespace StationeersMods
             if (queuedRefreshMods.Contains(_mod))
             {
                 queuedRefreshMods.Remove(_mod);
-                if(_mod is Mod modm)
-                OnModChanged(modm.modInfo.path);
+                if (_mod is Mod modm)
+                    OnModChanged(modm.modInfo.path);
             }
         }
 
@@ -449,6 +711,7 @@ namespace StationeersMods
                 if (_modPaths.ContainsKey(path))
                     return;
             }
+
             Debug.Log("creating new Mod from " + path);
             var mod = (path.EndsWith(".info")) ? new Mod(path) : new AssemblyMod(path);
 
@@ -467,7 +730,7 @@ namespace StationeersMods
                 mod.Loaded += OnModLoaded;
                 mod.Unloaded += OnModUnloaded;
                 mod.LoadCancelled += OnModLoadCancelled;
-                if(mod is Mod modm)
+                if (mod is Mod modm)
                 {
                     LogUtility.LogInfo("Mod is Mod: " + mod.name);
                     modm.SceneLoaded += OnSceneLoaded;
@@ -521,13 +784,14 @@ namespace StationeersMods
             mod.Loaded -= OnModLoaded;
             mod.Unloaded -= OnModUnloaded;
             mod.LoadCancelled -= OnModLoadCancelled;
-            
-            if(mod is Mod modm)
+
+            if (mod is Mod modm)
             {
                 modm.SceneLoaded -= OnSceneLoaded;
                 modm.SceneUnloaded -= OnSceneUnloaded;
                 modm.SceneLoadCancelled -= OnSceneLoadCancelled;
             }
+
             mod.SetInvalid();
 
             foreach (var other in _mods)
