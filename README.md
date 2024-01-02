@@ -136,13 +136,13 @@ To debug your own mod code when building a standalone code mod **without** Unity
 - Make sure you're building with debug information and `project properties -> Build -> Advanced... -> Debugging information` is set to "Portable". This is the only format supported by VSTU. 
 - Make sure the generated .pdb is copied along with the .dll to the exported mod folder.
 
-> *Note that this seems to work only with dotPeek since other tools (ILSpy, dnSpy, etc) do not export the .pdb in the correct (portable with external code) format.*
-
 To debug code from the game:
 - Find `[game folder]/rocketstation_Data/Managed/Assembly-CSharp.dll`. This file contains (most of) the game's code.
 - Install dotPeek and load up `Assembly-CSharp.dll`. After it loads, right-click Assembly-CSharp in the Assembly Exporer and select "Generate Pdb...". Export anywhere.
 - After exporting, copy the exported .pdb file (either works) next to `Assembly-CSharp.dll` in the Stationeers directory.
 - When debugging, you should now be able to step through and see any Stationeers code.
+
+> *Note that this seems to work only with dotPeek since other tools (ILSpy, dnSpy, etc) do not export the .pdb in the correct (portable with external code) format.*
 
 ## Exported Assetmod Content
 
