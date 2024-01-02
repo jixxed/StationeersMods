@@ -60,6 +60,8 @@
     <Compile Include="AssetUtility.cs" />
     <Compile Include="AssemblyEditor.cs" />
     <Compile Include="ArtifactEditor.cs" />
+    <Compile Include="DevelopmentEditor.cs" />
+    <Compile Include="DevelopmentPatcher.cs" />
     <Compile Include="SelectionEditor.cs" />
     <Compile Include="ExportEditor.cs" />
     <Compile Include="ExtraAssetsWindow.cs" />

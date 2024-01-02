@@ -1,6 +1,7 @@
 ﻿using StationeersMods.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace StationeersMods.Editor
         private SerializedProperty _description;
         private SerializedProperty _name;
         private SerializedProperty _outputDirectory;
+        private SerializedProperty _stationeersDirectory;
+        private SerializedProperty _stationeersArguments;
         private SerializedProperty _includePdbs;
         private SerializedProperty _version;
         private SerializedProperty _prefab;
@@ -40,6 +43,8 @@ namespace StationeersMods.Editor
             _description = serializedObject.FindProperty("_description");
             _version = serializedObject.FindProperty("_version");
             _outputDirectory = serializedObject.FindProperty("_outputDirectory");
+            _stationeersDirectory = serializedObject.FindProperty("_stationeersDirectory");
+            _stationeersArguments = serializedObject.FindProperty("_stationeersArguments");
             _includePdbs = serializedObject.FindProperty("_includePdbs");
             _prefab = serializedObject.FindProperty("_startupPrefab");
             _scene = serializedObject.FindProperty("_startupScene");
@@ -177,23 +182,47 @@ namespace StationeersMods.Editor
                 DrawStartupSelector(selectedBoot);
             });
         }
-        private void DrawDirectorySelector()
+
+        private void DrawDirectorySelector(string label, SerializedProperty path)
         {
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.TextField("Output Directory*:", GetShortString(_outputDirectory.stringValue));
+            path.stringValue = EditorGUILayout.TextField(label, path.stringValue);
 
             if (GUILayout.Button("...", GUILayout.Width(30)))
             {
                 var selectedDirectory =
-                    EditorUtility.SaveFolderPanel("Choose output directory", _outputDirectory.stringValue, "");
+                    EditorUtility.SaveFolderPanel("Choose directory", path.stringValue, "");
                 if (!string.IsNullOrEmpty(selectedDirectory))
-                    _outputDirectory.stringValue = selectedDirectory;
+                    path.stringValue = selectedDirectory;
 
                 Repaint();
             }
 
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawStationeersDirectorySelector()
+        {
+            DrawDirectorySelector("Stationeers Directory:", _stationeersDirectory);
+        }
+
+        private void DrawStationeersArgumentSelector()
+        {
+            _stationeersArguments.stringValue = EditorGUILayout.TextField("Stationeers arguments:", _stationeersArguments.stringValue);
+        }
+
+        private void DrawDevelopmentOptions()
+        {
+            DrawSection(() => {
+                DrawStationeersDirectorySelector();
+                DrawStationeersArgumentSelector();
+            });
+        }
+
+        private void DrawOutputDirectorySelector()
+        {
+            DrawDirectorySelector("Output Directory*:", _outputDirectory);
 
             if (_outputDirectory.stringValue == "")
             {
@@ -234,7 +263,7 @@ namespace StationeersMods.Editor
             DrawSection(() => {
                 DrawLogSelector();
                 DrawPdbSelector();
-                DrawDirectorySelector();
+                DrawOutputDirectorySelector();
             });
         }
 
@@ -244,6 +273,7 @@ namespace StationeersMods.Editor
             DrawContentSection();
             DrawExportOptions();
             DrawAssemblySelector();
+            DrawDevelopmentOptions();
         }
 
         public override void OnInspectorGUI()
@@ -275,16 +305,6 @@ namespace StationeersMods.Editor
 
             serializedObject.ApplyModifiedProperties();
             return valid;
-        }
-
-        private string GetShortString(string str)
-        {
-            var maxWidth = (int) EditorGUIUtility.currentViewWidth - 252;
-            var cutoffIndex = Mathf.Max(0, str.Length - 7 - maxWidth / 7);
-            var shortString = str.Substring(cutoffIndex);
-            if (cutoffIndex > 0)
-                shortString = "..." + shortString;
-            return shortString;
         }
     }
 }

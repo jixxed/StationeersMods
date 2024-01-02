@@ -24,6 +24,10 @@ namespace StationeersMods.Shared
 
         [SerializeField] private string _outputDirectory;
 
+        [SerializeField] private string _stationeersDirectory;
+
+        [SerializeField] private string _stationeersArguments;
+
         [SerializeField] private string _version;
 
         [SerializeField] private string[] _assemblies = new string[] { };
@@ -87,6 +91,10 @@ namespace StationeersMods.Shared
         }
 
         public string OutputDirectory { get => _outputDirectory; set => _outputDirectory = value; }
+
+        public string StationeersDirectory { get => _stationeersDirectory; set => _stationeersDirectory = value; }
+
+        public string StationeersArguments { get => _stationeersArguments; set => _stationeersArguments = value; }
 
         public ContentType ContentTypes { get => _contentTypes; set => _contentTypes =value;}
 
