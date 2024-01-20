@@ -2,9 +2,9 @@
 
 To be able to attach to the game, you need to have an IDE installed with the Unity debugger extensions. For Visual Studio, this is the Visual Studio Tools for Unity (VSTU).
 
-The first step is to set Stationeers to development mode. The easiest way to do this is to use the StationeersMods menu in Unity to enable development mode automatically. The steps to do it manually are as follows:
+The first step is to set Stationeers to development mode. The automatic way to do this is to use the StationeersMods menu in Unity, navigate to the `Development` tab, and click `Enable development mode`. The steps to do it manually are as follows:
 - Edit `[game folder]/rocketstation_Data/boot.config` and add the line: `player-connection-debug=1`
-- Copy the following files from `C:\Program Files\Unity 2021.2.13f1\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono`:
+- Copy the following files from `[Unity installation folder]\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono`:
   - `WindowsPlayer.exe` (to `[game folder]/rocketstation.exe`)
   - `UnityPlayer.dll` (to `[game folder]/UnityPlayer.dll`)
   - `MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll` (to `[game folder]/MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll`)
@@ -20,7 +20,7 @@ To debug your own mod code when building a standalone code mod **without** Unity
 
 To debug code from the game:
 - Find `[game folder]/rocketstation_Data/Managed/Assembly-CSharp.dll`. This file contains (most of) the game's code.
-- Install dotPeek and load up `Assembly-CSharp.dll`. After it loads, right-click Assembly-CSharp in the Assembly Exporer and select "Generate Pdb...". Export anywhere.
+- Install dotPeek and load up `Assembly-CSharp.dll`. After it loads, right-click Assembly-CSharp in the Assembly Exporer and select "Generate Pdb...". Export anywhere. It may take a while to finish.
 - After exporting, copy the exported .pdb file (either works) next to `Assembly-CSharp.dll` in the Stationeers directory.
 - When debugging, you should now be able to step through and see any Stationeers code.
 

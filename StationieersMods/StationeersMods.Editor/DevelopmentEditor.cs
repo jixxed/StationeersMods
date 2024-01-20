@@ -18,11 +18,11 @@ namespace StationeersMods.Editor
 
         public bool Draw(ExportSettings settings)
         {
-            EditorGUILayout.HelpBox("Various options to assist in mod development. Enabling development mode allows you to attach to the game and debug your code.", MessageType.Info, true);
+            EditorGUILayout.HelpBox("Various options to assist in mod development. Enabling development mode allows you to attach to the game and debug your code. See https://github.com/jixxed/StationeersMods/tree/main/doc/DEBUGGING.md for a guide.", MessageType.Info, true);
 
             if (!settings.IncludePdbs)
             {
-                EditorGUILayout.HelpBox("Debug information needs to be exported or it will not be possible to debug your code. Enable Export Settings > Export > Include PDBs.", MessageType.Error, true);
+                EditorGUILayout.HelpBox("Debug information needs to be exported or it will not be possible to debug your code. Enable Export > Include PDBs.", MessageType.Warning, true);
             }
 
             // Stationeers path
