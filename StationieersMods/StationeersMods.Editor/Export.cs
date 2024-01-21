@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using StationeersMods.Shared;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace StationeersMods.Editor
 {
@@ -208,6 +210,19 @@ namespace StationeersMods.Editor
             var exporter = new Export(settings);
             EditorUtility.SetDirty(settings);
             exporter.Run();
+        }
+
+        public static void RunGame(ExportSettings settings)
+        {
+            var patcher = new DevelopmentPatcher();
+
+            string pathToStationeers = patcher.PathToStationeersExecutable(settings);
+            if (!File.Exists(pathToStationeers))
+            {
+                throw new FileNotFoundException($"Game executable not found at \"{pathToStationeers}\". Make sure the Stationeers directory is configured correctly under export settings.");
+            }
+
+            Process.Start(pathToStationeers, settings.StationeersArguments ?? "");
         }
     }
 }

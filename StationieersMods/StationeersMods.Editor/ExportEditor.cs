@@ -13,21 +13,6 @@ namespace StationeersMods.Editor
 
     class ExportEditor
     {
-        private string GetShortString(string str)
-        {
-            if (str == null)
-            {
-                return null;
-            }
-
-            var maxWidth = (int)EditorGUIUtility.currentViewWidth - 252;
-            var cutoffIndex = Mathf.Max(0, str.Length - 7 - maxWidth / 7);
-            var shortString = str.Substring(cutoffIndex);
-            if (cutoffIndex > 0)
-                shortString = "..." + shortString;
-            return shortString;
-        }
-
         private void DrawSection(Action thunk)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
@@ -162,7 +147,7 @@ namespace StationeersMods.Editor
         {
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.TextField("Output Directory*:", GetShortString(settings.OutputDirectory));
+            EditorGUILayout.TextField("Output Directory*:", ExporterEditorWindow.GetShortString(settings.OutputDirectory));
 
             if (GUILayout.Button("...", GUILayout.Width(30)))
             {

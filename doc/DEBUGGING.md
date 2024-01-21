@@ -1,0 +1,27 @@
+# Debugging
+
+To be able to attach to the game, you need to have an IDE installed with the Unity debugger extensions. For Visual Studio, this is the Visual Studio Tools for Unity (VSTU).
+
+The first step is to set Stationeers to development mode. The automatic way to do this is to use the StationeersMods menu in Unity, navigate to the `Development` tab, and click `Enable development mode`. The steps to do it manually are as follows:
+- Edit `[game folder]/rocketstation_Data/boot.config` and add the line: `player-connection-debug=1`
+- Copy the following files from `[Unity installation folder]\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono`:
+  - `WindowsPlayer.exe` (to `[game folder]/rocketstation.exe`)
+  - `UnityPlayer.dll` (to `[game folder]/UnityPlayer.dll`)
+  - `MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll` (to `[game folder]/MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll`)
+
+After the game has been set to development mode, you should be able to attach. However, you need symbols to be able to actually debug.
+
+To debug your own mod code when building **with** Unity:
+- Make sure "Include PDBs" is checked in the export settings.
+
+To debug your own mod code when building a standalone code mod **without** Unity:
+- Make sure you're building with debug information and `project properties -> Build -> Advanced... -> Debugging information` is set to "Portable". This is the only format supported by VSTU. 
+- Make sure the generated .pdb is copied along with the .dll to the exported mod folder.
+
+To debug code from the game:
+- Find `[game folder]/rocketstation_Data/Managed/Assembly-CSharp.dll`. This file contains (most of) the game's code.
+- Install dotPeek and load up `Assembly-CSharp.dll`. After it loads, right-click Assembly-CSharp in the Assembly Exporer and select "Generate Pdb...". Export anywhere. It may take a while to finish.
+- After exporting, copy the exported .pdb file (either works) next to `Assembly-CSharp.dll` in the Stationeers directory.
+- When debugging, you should now be able to step through and see any Stationeers code. See https://docs.unity3d.com/Manual/ManagedCodeDebugging.html for additional information.
+
+> *Note that this seems to work only with dotPeek since other tools (ILSpy, dnSpy, etc) do not export the .pdb in the correct (portable with external code) format.*
