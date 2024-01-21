@@ -73,61 +73,48 @@ namespace StationeersMods.Editor
             catch(ArgumentException ex){ /* ignore */ }
             EditorGUILayout.LabelField("Stationeers mode:", GUILayout.Width(200));
             EditorGUILayout.LabelField(!Patcher.DevelopmentModeEnabled.HasValue ? "UNKNOWN" : (Patcher.DevelopmentModeEnabled.Value ? "DEVELOPMENT" : "RELEASE"));
-            // if (GUILayout.Button("Check", GUILayout.Width(200)))
-            // {
-            //     try
-            //     {
-            //         Patcher.CheckDevelopmentMode(settings);
-            //     }
-            //     catch(ArgumentException ex)
-            //     {
-            //         EditorUtility.DisplayDialog("Error", ex.Message, "OK");
-            //     }
-            //
-            // }
 
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
             int buttonWidth = 300;
-            // GUILayout.Space(Screen.width /2 - buttonWidth);
             if (!Patcher.DevelopmentModeEnabled.HasValue)
             {
                 GUI.enabled = false;
-            }
-
-            if (Patcher.DevelopmentModeEnabled.HasValue && !Patcher.DevelopmentModeEnabled.Value)
-            {
-                if (GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
-                {
-                    try
-                    {
-                        Patcher.SetDevelopmentMode(settings, true);
-                    }
-                    catch(ArgumentException ex)
-                    {
-                        EditorUtility.DisplayDialog("Error", ex.Message, "OK");
-                    }
-                }
+                GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35));
+                GUI.enabled = true;
             }
             else
             {
-                if (GUILayout.Button("Disable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
+                if (!Patcher.DevelopmentModeEnabled.Value)
                 {
-                    try
+                    if (GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
                     {
-                        Patcher.SetDevelopmentMode(settings, false);
-                    }
-                    catch(ArgumentException ex)
-                    {
-                        EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                        try
+                        {
+                            Patcher.SetDevelopmentMode(settings, true);
+                        }
+                        catch(ArgumentException ex)
+                        {
+                            EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                        }
                     }
                 }
-            }
-            if (!Patcher.DevelopmentModeEnabled.HasValue)
-            {
-                GUI.enabled = true;
+                else
+                {
+                    if (GUILayout.Button("Disable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
+                    {
+                        try
+                        {
+                            Patcher.SetDevelopmentMode(settings, false);
+                        }
+                        catch(ArgumentException ex)
+                        {
+                            EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                        }
+                    }
+                }
             }
             GUILayout.EndHorizontal();
 
