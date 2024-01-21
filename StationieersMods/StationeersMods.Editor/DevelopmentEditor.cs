@@ -72,7 +72,7 @@ namespace StationeersMods.Editor
             }
             catch(ArgumentException ex){ /* ignore */ }
             EditorGUILayout.LabelField("Stationeers mode:", GUILayout.Width(200));
-            EditorGUILayout.LabelField(!Patcher.DevelopmentModeEnabled.HasValue ? "UNKNOWN" : (Patcher.DevelopmentModeEnabled.Value ? "DEVELOPMENT" : "RELEASE"));
+            EditorGUILayout.LabelField(!Patcher.DevelopmentModeEnabled.HasValue ? "Unknown. Did you configure the Stationeers directory?" : (Patcher.DevelopmentModeEnabled.Value ? "Development" : "Release"));
 
             GUILayout.EndHorizontal();
 
