@@ -68,8 +68,8 @@ namespace StationeersMods.Editor
             exportSettingsEditor = UnityEditor.Editor.CreateEditor(exportSettings.instance) as ExportSettingsEditor;
             assemblyEditor = new AssemblyEditor();
             artifactEditor = new ArtifactEditor();
+            developmentEditor = new DevelopmentEditor(exportSettings.instance);
             exportEditor = new ExportEditor();
-            developmentEditor = new DevelopmentEditor();
         }
 
         private void OnDisable()

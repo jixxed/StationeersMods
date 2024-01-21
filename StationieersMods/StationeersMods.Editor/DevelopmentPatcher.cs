@@ -27,21 +27,19 @@ namespace StationeersMods.Editor
         public string ReleasePlayerPath => Path.Combine(PathToPlayerDirectory, "win64_player_nondevelopment_mono/UnityPlayer.dll");
         public string ReleaseMonoPath => Path.Combine(PathToPlayerDirectory, "win64_player_nondevelopment_mono/MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll");
 
-        private bool ValidateDirectory(ExportSettings settings)
+        private void ValidateDirectory(ExportSettings settings)
         {
             if (string.IsNullOrEmpty(settings.StationeersDirectory))
             {
-                EditorUtility.DisplayDialog("Error", "The Stationeers directory is not set", "OK");
-                return false;
+                DevelopmentModeEnabled = null;
+                throw new ArgumentException("The Stationeers directory is not set");
             }
 
             if (!Directory.Exists(settings.StationeersDirectory))
             {
-                EditorUtility.DisplayDialog("Error", "The Stationeers directory is not valid", "OK");
-                return false;
+                DevelopmentModeEnabled = null;
+                throw new ArgumentException("The Stationeers directory is not valid");
             }
-
-            return true;
         }
 
         private bool CheckIsIdentical(string fileA, string fileB)
@@ -55,13 +53,9 @@ namespace StationeersMods.Editor
 
         public void CheckDevelopmentMode(ExportSettings settings)
         {
-            if (!ValidateDirectory(settings))
-            {
-                DevelopmentModeEnabled = null;
-                return;
-            }
+            ValidateDirectory(settings);
 
-            // Check the player connection option is enabled
+                // Check the player connection option is enabled
             var configLines = File.ReadAllLines(PathToBootConfig(settings));
             if (!configLines.Contains("player-connection-debug=1"))
             {
@@ -85,11 +79,7 @@ namespace StationeersMods.Editor
 
         public void SetDevelopmentMode(ExportSettings settings, bool enabled)
         {
-            if (!ValidateDirectory(settings))
-            {
-                EditorUtility.DisplayDialog("Error", "Development mode cannot be toggled: the Stationeers directory is not valid", "OK");
-                return;
-            }
+            ValidateDirectory(settings);
 
             // Change player connection line
             var configLines = File.ReadAllLines(PathToBootConfig(settings));

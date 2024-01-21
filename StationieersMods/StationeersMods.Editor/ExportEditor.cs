@@ -181,10 +181,21 @@ namespace StationeersMods.Editor
 
         private void DrawSections(ExportSettings settings)
         {
+            
+            DrawAlert(settings);
             DrawDetails(settings);
             DrawContentSection(settings);
             DrawExportOptions(settings);
         }
+
+        private static void DrawAlert(ExportSettings settings)
+        {
+            if (DevelopmentEditor.Patcher.DevelopmentModeEnabled == true && !settings.IncludePdbs)
+            {
+                EditorGUILayout.HelpBox("Development mode is enabled. Debug information needs to be exported or it will not be possible to debug your code. Make sure to tick Include PDBs.", MessageType.Warning, true);
+            }
+        }
+
         public bool Draw(ExportSettings settings)
         {
             var valid = true;
