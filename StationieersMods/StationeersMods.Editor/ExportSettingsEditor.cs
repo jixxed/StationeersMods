@@ -26,6 +26,7 @@ namespace StationeersMods.Editor
         private SerializedProperty _stationeersDirectory;
         private SerializedProperty _stationeersArguments;
         private SerializedProperty _includePdbs;
+        private SerializedProperty _waitForDebugger;
         private SerializedProperty _version;
         private SerializedProperty _prefab;
         private SerializedProperty _scene;
@@ -46,6 +47,7 @@ namespace StationeersMods.Editor
             _stationeersDirectory = serializedObject.FindProperty("_stationeersDirectory");
             _stationeersArguments = serializedObject.FindProperty("_stationeersArguments");
             _includePdbs = serializedObject.FindProperty("_includePdbs");
+            _waitForDebugger = serializedObject.FindProperty("_waitForDebugger");
             _prefab = serializedObject.FindProperty("_startupPrefab");
             _scene = serializedObject.FindProperty("_startupScene");
             _class = serializedObject.FindProperty("_startupClass");
@@ -211,12 +213,17 @@ namespace StationeersMods.Editor
         {
             _stationeersArguments.stringValue = EditorGUILayout.TextField("Stationeers arguments:", _stationeersArguments.stringValue);
         }
+        private void DrawStationeersWaitForDebugger()
+        {
+            _waitForDebugger.boolValue = EditorGUILayout.Toggle("Wait for debugger on game launch:", _waitForDebugger.boolValue);
+        }
 
         private void DrawDevelopmentOptions()
         {
             DrawSection(() => {
                 DrawStationeersDirectorySelector();
                 DrawStationeersArgumentSelector();
+                DrawStationeersWaitForDebugger();
             });
         }
 
@@ -237,7 +244,7 @@ namespace StationeersMods.Editor
 
         private void DrawPdbSelector()
         {
-            _includePdbs.boolValue = EditorGUILayout.Toggle("Include PDBs:", _includePdbs.boolValue);
+            _includePdbs.boolValue = EditorGUILayout.Toggle("Include Pdb's:", _includePdbs.boolValue);
         }
 
         private void DrawAssemblySelector()

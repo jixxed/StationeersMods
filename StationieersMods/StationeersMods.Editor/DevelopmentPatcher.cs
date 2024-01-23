@@ -83,8 +83,14 @@ namespace StationeersMods.Editor
 
             // Change player connection line
             var configLines = File.ReadAllLines(PathToBootConfig(settings));
-            var newConfigLines = configLines.Where(line => !line.Contains("player-connection-debug")).ToList();
-            newConfigLines.Add($"player-connection-debug={(enabled ? 1 : 0)}");
+            var newConfigLines = configLines.Where(line => isDebugRelated(line)).ToList();
+            if (enabled)
+            {
+                newConfigLines.Add("player-connection-debug=1");
+                newConfigLines.Add($"wait-for-managed-debugger={(settings.WaitForDebugger ? 1 : 0)}");
+                newConfigLines.Add("player-connection-project-name=Stationeers");
+            }
+
             File.WriteAllLines(PathToBootConfig(settings), newConfigLines);
 
             // Change files
@@ -95,6 +101,11 @@ namespace StationeersMods.Editor
 
             // Verify change
             CheckDevelopmentMode(settings);
+        }
+
+        private static bool isDebugRelated(string line)
+        {
+            return !line.Contains("player-connection-debug") && !line.Contains("wait-for-managed-debugger") && !line.Contains("player-connection-project-name");
         }
     }
 }

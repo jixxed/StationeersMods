@@ -63,6 +63,12 @@ namespace StationeersMods.Editor
 
             GUILayout.Space(5);
 
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Wait for debugger on game launch:", GUILayout.Width(200));
+            settings.WaitForDebugger = EditorGUILayout.Toggle("", settings.WaitForDebugger, GUILayout.Width(20));
+            EditorGUILayout.LabelField("This setting is applied when development mode is enabled");
+            GUILayout.EndHorizontal();
+        
             // Development mode
             GUILayout.BeginHorizontal();
             
