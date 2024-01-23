@@ -47,16 +47,16 @@ Select a folder to store generated Pdb's(somewhere outside the gamefolder) and c
 4. Here you can start the symbol server.
 5. This symbol will show when the server is active and can be right clicked for more information.
 
-Next you need to setup your IDE to connect to the symbol server.\
+Next you need to setup your IDE to connect to the symbol server.
 ### JetBrains Rider
 Go to `File > Settings... > Tools > External Symbols` and add the Symbol server as shown below:\
-![Image](symbol_server_rider.png)\
+![Image](symbol_server_rider.png)
 ### Visual Studio
 Source: [jetbrains.com](https://www.jetbrains.com/help/decompiler/Using_product_as_a_Symbol_Server.html)
 1. In the Visual Studio menu, select `Tools > Options > Debugging > Symbols`.
 
 2. Click `Add new location` and specify the following address for it: `http://localhost:33417/`. (The port number is configurable on the Symbol Server page of dotPeek options.)\
-![Image](vs_symbol_options.png)\
+![Image](vs_symbol_options.png)
 3. In the Visual Studio options, go to the `Debugging > General` page and clear the Enable Just My Code checkbox.
 
 ## JetBrains Rider
