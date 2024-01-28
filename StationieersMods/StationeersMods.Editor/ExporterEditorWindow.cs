@@ -6,6 +6,7 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 namespace StationeersMods.Editor
 {
@@ -21,9 +22,24 @@ namespace StationeersMods.Editor
         ExportEditor exportEditor;
         AssemblyEditor assemblyEditor;
         ArtifactEditor artifactEditor;
+        DevelopmentEditor developmentEditor;
 
+        public static string GetShortString(string str)
+        {
+            if (str == null)
+            {
+                return null;
+            }
 
-        [MenuItem("StationeersMods/Export Mod")]
+            var maxWidth = (int)EditorGUIUtility.currentViewWidth - 252;
+            var cutoffIndex = Mathf.Max(0, str.Length - 7 - maxWidth / 7);
+            var shortString = str.Substring(cutoffIndex);
+            if (cutoffIndex > 0)
+                shortString = "..." + shortString;
+            return shortString;
+        }
+
+        [MenuItem("StationeersMods/Export Settings")]
         public static void ShowWindow()
         {
             var window = GetWindow<ExporterEditorWindow>();
@@ -33,12 +49,26 @@ namespace StationeersMods.Editor
             window.Focus();
         }
 
+        [MenuItem("StationeersMods/Export Mod", false, 20)]
+        public static void ExportModMenuItem()
+        {
+            ExportMod();
+        }
+
+        [MenuItem("StationeersMods/Export && Run Mod", false, 20)]
+        public static void ExportAndRunModMenuItem()
+        {
+            ExportMod();
+            RunGame();
+        }
+
         private void OnEnable()
         {
             exportSettings = new EditorScriptableSingleton<ExportSettings>();
             exportSettingsEditor = UnityEditor.Editor.CreateEditor(exportSettings.instance) as ExportSettingsEditor;
             assemblyEditor = new AssemblyEditor();
             artifactEditor = new ArtifactEditor();
+            developmentEditor = new DevelopmentEditor(exportSettings.instance);
             exportEditor = new ExportEditor();
         }
 
@@ -51,12 +81,27 @@ namespace StationeersMods.Editor
         {
             if (exportEditor.Draw(settings))
             {
-                var buttonPressed = GUILayout.Button("Save & Export", GUILayout.Height(30));
+                GUILayout.Space(10);
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(50);
+
+                if (GUILayout.Button("Save & Export", GUILayout.Height(30)))
+                {
+                    Export.ExportMod(settings);
+                }
+
+                GUILayout.Space(5);
+
+                if (GUILayout.Button("Save & Export & Run", GUILayout.Height(30)))
+                {
+                    Export.ExportMod(settings);
+                    Export.RunGame(settings);
+                }
+
+                GUILayout.Space(50);
+                GUILayout.EndHorizontal();
 
                 GUILayout.FlexibleSpace();
-
-                if (buttonPressed)
-                    Export.ExportMod(settings);
             }
         }
 
@@ -66,7 +111,7 @@ namespace StationeersMods.Editor
 
             var settings = exportSettings.instance;
 
-            var tabs = new string[] { "Export", "Assemblies", "Copy Artifacts" };
+            var tabs = new string[] { "Export", "Assemblies", "Copy Artifacts", "Development" };
 
             selectedTab = GUILayout.Toolbar(selectedTab, tabs);
 
@@ -81,6 +126,9 @@ namespace StationeersMods.Editor
                 case "Copy Artifacts":
                     settings.Artifacts = artifactEditor.Draw(settings);
                     break;
+                case "Development":
+                    developmentEditor.Draw(settings);
+                    break;
             }
         }
 
@@ -88,6 +136,12 @@ namespace StationeersMods.Editor
         {
             var singleton = new EditorScriptableSingleton<ExportSettings>();
             Export.ExportMod(singleton.instance);
+        }
+
+        public static void RunGame()
+        {
+            var singleton = new EditorScriptableSingleton<ExportSettings>();
+            Export.RunGame(singleton.instance);
         }
     }
 }

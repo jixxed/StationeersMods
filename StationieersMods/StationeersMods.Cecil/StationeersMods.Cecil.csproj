@@ -69,14 +69,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)ExampleMod\Assets\StationeersMods\Editor\$(TargetName).dll"
-echo f | xcopy /s /i /Y "$(TargetDir)Mono.Cecil.dll" "$(SolutionDir)ExampleMod\Assets\StationeersMods\Editor\Mono.Cecil.dll"
-
-echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"
-
-echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\Editor\$(TargetName).dll"
-echo f | xcopy /s /i /Y "$(TargetDir)Mono.Cecil.dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\Editor\Mono.Cecil.dll"
-</PostBuildEvent>
+    <PostBuildEvent>
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\Editor\$(TargetName).dll"
+	echo f | xcopy /s /i /Y "$(TargetDir)Mono.Cecil.dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\Editor\Mono.Cecil.dll"
+	</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PostBuildEvent>
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)build\StationeersMods\$(TargetName).pdb"
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\Editor\$(TargetName).pdb"
+	</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

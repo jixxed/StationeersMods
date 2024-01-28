@@ -24,6 +24,10 @@ namespace StationeersMods.Shared
 
         [SerializeField] private string _outputDirectory;
 
+        [SerializeField] private string _stationeersDirectory;
+
+        [SerializeField] private string _stationeersArguments;
+
         [SerializeField] private string _version;
 
         [SerializeField] private string[] _assemblies = new string[] { };
@@ -33,6 +37,7 @@ namespace StationeersMods.Shared
         [SerializeField] private ContentType _contentTypes;
 
         [SerializeField] private bool _includePdbs;
+        [SerializeField] private bool _waitForDebugger;
 
         [SerializeField] private BootType _bootType;
 
@@ -88,9 +93,14 @@ namespace StationeersMods.Shared
 
         public string OutputDirectory { get => _outputDirectory; set => _outputDirectory = value; }
 
+        public string StationeersDirectory { get => _stationeersDirectory; set => _stationeersDirectory = value; }
+
+        public string StationeersArguments { get => _stationeersArguments; set => _stationeersArguments = value; }
+
         public ContentType ContentTypes { get => _contentTypes; set => _contentTypes =value;}
 
         public bool IncludePdbs { get => _includePdbs; set => _includePdbs = value; }
+        public bool WaitForDebugger { get => _waitForDebugger; set => _waitForDebugger = value; }
 
         public BootType BootType { get => _bootType; set => _bootType =value;}
 

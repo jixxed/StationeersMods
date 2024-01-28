@@ -13,21 +13,6 @@ namespace StationeersMods.Editor
 
     class ExportEditor
     {
-        private string GetShortString(string str)
-        {
-            if (str == null)
-            {
-                return null;
-            }
-
-            var maxWidth = (int)EditorGUIUtility.currentViewWidth - 252;
-            var cutoffIndex = Mathf.Max(0, str.Length - 7 - maxWidth / 7);
-            var shortString = str.Substring(cutoffIndex);
-            if (cutoffIndex > 0)
-                shortString = "..." + shortString;
-            return shortString;
-        }
-
         private void DrawSection(Action thunk)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
@@ -78,7 +63,7 @@ namespace StationeersMods.Editor
         private void DrawPdbSelector(ExportSettings settings)
         {
             EditorGUILayout.LabelField("You can include a debug database. You might want to exclude it once you publish, since it is of no use to end users.");
-            settings.IncludePdbs = EditorGUILayout.Toggle("Include PDBs:", settings.IncludePdbs);
+            settings.IncludePdbs = EditorGUILayout.Toggle("Include Pdb's:", settings.IncludePdbs);
         }
 
         private void DrawBootSelector(ExportSettings settings)
@@ -162,7 +147,7 @@ namespace StationeersMods.Editor
         {
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.TextField("Output Directory*:", GetShortString(settings.OutputDirectory));
+            EditorGUILayout.TextField("Output Directory*:", ExporterEditorWindow.GetShortString(settings.OutputDirectory));
 
             if (GUILayout.Button("...", GUILayout.Width(30)))
             {
@@ -196,10 +181,21 @@ namespace StationeersMods.Editor
 
         private void DrawSections(ExportSettings settings)
         {
+            
+            DrawAlert(settings);
             DrawDetails(settings);
             DrawContentSection(settings);
             DrawExportOptions(settings);
         }
+
+        private static void DrawAlert(ExportSettings settings)
+        {
+            if (DevelopmentEditor.Patcher.DevelopmentModeEnabled == true && !settings.IncludePdbs)
+            {
+                EditorGUILayout.HelpBox("Development mode is enabled. Debug information needs to be exported or it will not be possible to debug your code. Make sure to tick Include PDBs.", MessageType.Warning, true);
+            }
+        }
+
         public bool Draw(ExportSettings settings)
         {
             var valid = true;

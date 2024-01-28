@@ -44,15 +44,23 @@
     <Compile Include="ContentHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\AssemblyInfo.cs" />
+    <Compile Include="ShaderType.cs" />
+    <Compile Include="StationeersColor.cs" />
+    <Compile Include="StationeersModsUtility.cs" />
+    <Compile Include="StationeersTool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)ExampleMod\Assets\StationeersMods\$(TargetName).dll"
-
-echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"
-
-echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\$(TargetName).dll"
-</PostBuildEvent>
+    <PostBuildEvent>
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods\$(TargetName).dll"
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\$(TargetName).dll"
+	</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PostBuildEvent>
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)build\StationeersMods\$(TargetName).pdb"
+	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)build\StationeersMods-exporter\Assets\StationeersMods\$(TargetName).pdb"
+	</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
