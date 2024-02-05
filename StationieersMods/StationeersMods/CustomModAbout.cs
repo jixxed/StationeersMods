@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace StationeersMods.Plugin
@@ -20,6 +21,8 @@ namespace StationeersMods.Plugin
         public string Description;
         [XmlElement]
         public string InGameDescription;
+        [XmlElement]
+        public string ChangeLog;
         [XmlElement]
         public ulong WorkshopHandle;
         [XmlArray("Tags")]

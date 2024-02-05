@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Objects.Pipes;
+using HarmonyLib;
 using StationeersMods.Shared;
 using UnityEditor;
 using UnityEngine;
@@ -123,8 +124,62 @@ namespace StationeersMods.Editor
                 }
             }
             GUILayout.EndHorizontal();
-
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Copy game assemblies to project", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
+            {
+                try
+                {
+                    CopyAssemblies(settings);
+                    EditorUtility.DisplayDialog("Complete", "All files have been copied.", "OK");
+                }
+                catch(ArgumentException ex)
+                {
+                    EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                }
+            }
+            GUILayout.EndHorizontal();
             return true;
+        }
+
+        private void CopyAssemblies(ExportSettings settings)
+        {
+            if (!Directory.Exists(settings.StationeersDirectory))
+            {
+                throw new ArgumentException("Did you configure the Stationeers directory? Could not find " + settings.StationeersDirectory);
+            }
+            var assembliesFolder = Path.Combine(Application.dataPath, "Assemblies");
+            var assemblies = Path.Combine(assembliesFolder, "copy.txt");
+            if (!File.Exists(assemblies))
+            {
+                throw new ArgumentException("Could not find " + assemblies);
+            }
+            List<string> errors = new List<string>();
+            foreach (var line in File.ReadLines(assemblies))
+            {
+                if (line == "")
+                {
+                    continue;
+                }
+                var assemblyToCopy = Path.Combine(settings.StationeersDirectory, line);
+
+                if (File.Exists(assemblyToCopy))
+                {
+                    Debug.Log("Copy: " + assemblyToCopy + " to " + assembliesFolder);
+                    File.Copy(assemblyToCopy,Path.Combine(assembliesFolder, Path.GetFileName(assemblyToCopy)),true);
+                }
+                else
+                {
+                    Debug.LogError("Error: " + assemblyToCopy + " doesn't exist");
+                    errors.Add(assemblyToCopy);
+                }
+
+            }
+
+            if (errors.Count > 0)
+            {
+                throw new ArgumentException("Failed to copy the following assemblies:\n" + string.Join("\n", errors));
+            }
         }
     }
 }
