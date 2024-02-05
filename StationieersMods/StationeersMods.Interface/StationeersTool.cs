@@ -13,7 +13,7 @@
         public static StationeersTool FIRE_EXTINGUISHER = new StationeersTool( "ItemFireExtinguisher");
         public static StationeersTool LABELLER = new StationeersTool( "ItemLabeller");
         public static StationeersTool WRENCH = new StationeersTool( "ItemWrench");
-        public static StationeersTool SCREWDRIVER = new StationeersTool( "ItemScrewdrive");
+        public static StationeersTool SCREWDRIVER = new StationeersTool( "ItemScrewdriver");
         public string PrefabName { get; private set; }
 
         public StationeersTool(string prefabName)
