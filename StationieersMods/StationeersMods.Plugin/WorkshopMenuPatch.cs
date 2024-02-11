@@ -102,6 +102,11 @@ namespace StationeersMods.Plugin
                 Debug.Log("Mod description exceeds 8000 characters limit");
                 errorMessages.Add("Mod description exceeds 8000 characters limit");
             }
+            if(aboutData.ChangeLog.Length > 8000)
+            {
+                Debug.Log("Mod changelog exceeds 8000 characters limit");
+                errorMessages.Add("Mod changelog exceeds 8000 characters limit");
+            }
             if(File.Exists(image) && new FileInfo(image).Length > (1024 * 1024))
             {
                 Debug.Log("Mod image size exceeds 1MB limit");
