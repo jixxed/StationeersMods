@@ -40,7 +40,7 @@ namespace StationeersMods.Plugin
             var selectedMod = GetSelectedModData(__instance);
             if( File.Exists(selectedMod.Data.LocalPath + "\\About\\stationeersmods"))
             {
-                string descriptionText = XmlSerialization.Deserialize<CustomModAbout>(selectedMod.Data.AboutXmlPath, "ModMetadata").InGameDescription;
+                string descriptionText = XmlSerialization.Deserialize<CustomModAbout>(selectedMod.Data.AboutXmlPath, "ModMetadata").InGameDescription.Value;
                 if(descriptionText != null && !descriptionText.Equals(string.Empty))
                 {
                     __instance.DescriptionText.text = descriptionText;

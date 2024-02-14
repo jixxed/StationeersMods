@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>ExamplePatchMod [StationeersMods]</Name>
+  <Author>Example</Author>
+  <Version>0.2.3773.18265.1</Version>
+  <Description>[h1]ExamplePatchMod[/h1]
+    [b]WARNING:[/b] This is a StationeersMods Plugin Mod. It requires Bepinex to be installed with the StationeersMods plugin.
+    See: https://github.com/jixxed/StationeersMods
+
+    Description for ExamplePatchMod
+  </Description>
+  <InGameDescription>
+    <![CDATA[<size="30"><color=#ffa500> ExamplePatchMod </color></size>
+<b>WARNING:</b> <color=#ff0000>This is a StationeersMods Plugin Mod. It requires Bepinex to be installed with the StationeersMods plugin.</color>
+See: https://github.com/jixxed/StationeersMods
+
+Description for ExamplePatchMod
+]]>
+  </InGameDescription>
+  <Tags />
+</ModMetadata>

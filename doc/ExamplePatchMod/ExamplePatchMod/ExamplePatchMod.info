@@ -1,0 +1,11 @@
+{
+    "_name": "ExamplePatchMod",
+    "_author": "Example",
+    "_description": "ExamplePatchMod",
+    "_version": "1",
+    "_unityVersion": "2021.2.13f1",
+    "_platforms": 1,
+    "_content": 4,
+    "_contentTypes": 2,
+    "_isEnabled": false
+}

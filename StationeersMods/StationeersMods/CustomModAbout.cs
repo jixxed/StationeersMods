@@ -19,8 +19,20 @@ namespace StationeersMods.Plugin
         public string Version;
         [XmlElement]
         public string Description;
-        [XmlElement]
-        public string InGameDescription;
+        [XmlIgnore]
+        public string _inGameDescription;
+        [XmlElement("InGameDescription")]
+        public System.Xml.XmlCDataSection InGameDescription
+        {
+            get
+            {
+                return new System.Xml.XmlDocument().CreateCDataSection(_inGameDescription);
+            }
+            set
+            {
+                _inGameDescription = value.Value;
+            }
+        }
         [XmlElement]
         public string ChangeLog;
         [XmlElement]

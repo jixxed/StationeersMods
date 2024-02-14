@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{8F3C8507-824F-42A6-9C7D-F2F2E34AAFEB}</ProjectGuid>
+        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>StationeersMods.Tests</RootNamespace>
+        <AssemblyName>StationeersMods.Tests</AssemblyName>
+        <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="packages.config" />
+    </ItemGroup>
+
+    <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
+    <Import Project="$(SolutionDir)StationeersMods.VS.props" />
+    <ItemGroup>
+        <Compile Include="Tests.cs"/>
+        <Compile Include="Properties\AssemblyInfo.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="System"/>
+        <Reference Include="System.Core"/>
+        <Reference Include="System.Data"/>
+        <Reference Include="System.Xml"/>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(StationeersDirectory)\rocketstation_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\StationeersMods.Cecil\StationeersMods.Cecil.csproj">
+            <Project>{C07BE8A5-F75A-4A95-8ED1-450162264EAF}</Project>
+            <Name>StationeersMods.Cecil</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\StationeersMods.Interface\StationeersMods.Interface.csproj">
+            <Project>{f3f7f434-f83d-4ab5-872c-122d89ec81ea}</Project>
+            <Name>StationeersMods.Interface</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\StationeersMods.Shared\StationeersMods.Shared.csproj">
+            <Project>{5e13231b-ca13-4496-b32c-bb033b15a379}</Project>
+            <Name>StationeersMods.Shared</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\StationeersMods\StationeersMods.csproj">
+            <Project>{b8cbc92f-7c31-452c-bba8-a91957d332df}</Project>
+            <Name>StationeersMods</Name>
+        </ProjectReference>
+        <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+            <HintPath>..\..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    
+    
+<!--    <ItemGroup>-->
+<!--        <PackageReference Include="nunit" Version="4.0.1" />-->
+<!--        <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />-->
+<!--        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />-->
+<!--        <PackageReference Include="NUnit.Analyzers" Version="4.0.1">-->
+<!--            <PrivateAssets>all</PrivateAssets>-->
+<!--            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>-->
+<!--        </PackageReference>-->
+<!--        <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">-->
+<!--            <HintPath>..\..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>-->
+<!--        </Reference>-->
+<!--    </ItemGroup>-->
+<!--    <ItemGroup>-->
+<!--        <ProjectReference Include="..\StationeersMods\StationeersMods.csproj">-->
+<!--            <Project>{b8cbc92f-7c31-452c-bba8-a91957d332df}</Project>-->
+<!--            <Name>StationeersMods</Name>-->
+<!--        </ProjectReference>-->
+<!--    </ItemGroup>-->
+<!--    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>-->
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+
+</Project>
