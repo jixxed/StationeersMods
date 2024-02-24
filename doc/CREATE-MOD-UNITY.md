@@ -23,7 +23,12 @@ Once the project is imported you can check the asmdef in the Scripts folder. it 
 ![Image](asmdef.png)
 
 ### TMP Fix
-The game uses TextMeshPro. This requires a package in Unity. There is a bug in the TMP Code you can patch by replacing 2 files in: %localappdata%\Unity\cache\packages\packages.unity.com\com.unity.textmeshpro@3.0.6\Scripts\Runtime
+The game uses TextMeshPro. This requires a package in Unity. There is a bug in the TMP Code you can patch by replacing 2 files in:  
+
+| OS | PATH |
+| ------------- | ------------- |
+|**Windows**|%localappdata%\Unity\cache\packages\packages.unity.com\com.unity.textmeshpro@3.0.6\Scripts\Runtime|
+|**Linux**|~/.config/unity3d/cache/packages/packages.unity.com/com.unity.textmeshpro@3.0.6/Scripts/Runtime|
 
 You can get the files from [TMP_Fix.zip](TMP_Fix.zip).
 
@@ -45,8 +50,12 @@ Fill in the settings:
 - **Include Content:** Content to include. For this example it will be `Everything`
 - **Startup Type:** Type of startup class. For this example it will be `Code`
 - **Startup class:** Name of the startup class
-- **Output Directory:** Description for your mod (set this to your local mods folder: C:\Users\\[USERNAME]\Documents\My Games\Stationeers\mods)
+- **Output Directory:** Description for your mod (set this to your local mods folder)
 
+| OS | local mods folder PATH |
+| ------------- | ------------- |
+|**Windows**|%userprofile%\Documents\My Games\Stationeers\mods|
+|**Linux**|[steam location]/steamapps/compatdata/544550/pfx/drive_c/users/steamuser/Documents/My Games/Stationeers/mods|
 ![Image](export_settings1.png)
 
 On the **Assemblies** tab add the .asmdef file
@@ -57,13 +66,21 @@ Back on the Export tab you can click export and your mod should be built into th
 
 ## Testing
 
-Copy the mod over to the local mods folder (C:\Users\\[USERNAME]\Documents\My Games\Stationeers\mods) if you did not set it as the output directory.
+Copy the mod over to the local mods folder if you did not set it as the output directory.
+
+| OS | local mods folder PATH |
+| ------------- | ------------- |
+|**Windows**|%userprofile%\Documents\My Games\Stationeers\mods|
+|**Linux**|[steam location]/steamapps/compatdata/544550/pfx/drive_c/users/steamuser/Documents/My Games/Stationeers/mods|
 
 Start the game and check the logs. This example mod writes a `Hello World!` to the log.
 
 You can see it in game if you have the UnityExplorer plugin or if you check the game log
-(AppData\LocalLow\Rocketwerkz\rocketstation\Player.log) 
 
+| OS | log file PATH |
+| ------------- | ------------- |
+|**Windows**|%userprofile%\appdata\LocalLow\Rocketwerkz\rocketstation\Player.log|
+|**Linux**|[steam location]/steamapps/compatdata/544550/pfx/drive_c/users/steamuser/AppData/LocalLow/Rocketwerkz/rocketstation/Player.log|
 ![Image](load_success.png)
 
 ## Modifications
