@@ -56,6 +56,7 @@ Fill in the settings:
 | ------------- | ------------- |
 |**Windows**|%userprofile%\Documents\My Games\Stationeers\mods|
 |**Linux**|[steam location]/steamapps/compatdata/544550/pfx/drive_c/users/steamuser/Documents/My Games/Stationeers/mods|
+
 ![Image](export_settings1.png)
 
 On the **Assemblies** tab add the .asmdef file
@@ -81,6 +82,7 @@ You can see it in game if you have the UnityExplorer plugin or if you check the 
 | ------------- | ------------- |
 |**Windows**|%userprofile%\appdata\LocalLow\Rocketwerkz\rocketstation\Player.log|
 |**Linux**|[steam location]/steamapps/compatdata/544550/pfx/drive_c/users/steamuser/AppData/LocalLow/Rocketwerkz/rocketstation/Player.log|
+
 ![Image](load_success.png)
 
 ## Modifications
