@@ -7,8 +7,7 @@ This guide is written Unity version 2021.2.13f1.
 Download the [ExamplePatchMod](ExamplePatchMod.zip). This contains a working starter mod you can easily adapt.
 
 - Extract the zip into a project folder (ex. ExamplePatchMod)
-- In Assets/Assemblies there is a README. This contains a list of dll's you need to copy over.
-
+- ExamplePatchMod.VS.props contains a property key pointing to the Stationeers game folder. Set this to the correct path so required dll's are resolved automatically.
 ## Preparation steps
 In the zip is a readme. follow the instructions defined there.
 
