@@ -4,9 +4,9 @@ This guide will help you build your first mod and load it in the game. You can a
 This guide is written Unity version 2021.2.13f1.
 
 ## Extract template
-Download the [ExamplePatchMod](ExamplePatchMod.zip). This contains a working starter mod you can easily adapt.
+Download the [ExamplePatchMod](https://github.com/StationeersMods/ExamplePatchMod). This contains a working starter mod you can easily adapt.
 
-- Extract the zip into a project folder (ex. ExamplePatchMod)
+- Copy the project into a project folder (ex. ExamplePatchMod)
 - ExamplePatchMod.VS.props contains a property key pointing to the Stationeers game folder. Set this to the correct path so required dll's are resolved automatically.
 ## Preparation steps
 In the zip is a readme. follow the instructions defined there.

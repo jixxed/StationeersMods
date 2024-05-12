@@ -4,10 +4,10 @@ This guide will help you build your first mod and load it in the game. You can a
 This guide is written Unity version 2021.2.13f1.
 
 ## Import template
-Download the [ExampleMod](ExampleMod.zip). This contains a working starter mod you can easily adapt.
+Download the [ExampleMod](https://github.com/StationeersMods/ExampleMod). This contains a working starter mod you can easily adapt.
 
-- Extract the zip into a project folder (ex. ExampleMod)
-- In Assets/Assemblies there is a README. This contains a list of dll's you need to copy over.
+- Copy the project into a project folder (ex. ExampleMod)
+- In Assets/Assemblies there is a copy.txt file. This contains a list of dll's you need to copy over. This can be done with the click of a button inside the Unity Editor.
 - In Assets/StationeersMods is the exporter plugin for Unity. You should update this with the latest version of StationeersMods-exporter.zip from [Github](https://github.com/jixxed/StationeersMods/releases).
 - Open the folder in the Unity Hub and open the project.
 
@@ -16,6 +16,12 @@ If the project fails to compile you will get an error:
 ![Image](import_error.png)
 
 You can click Ignore and try to fix the issues. This will usually be related to changes in the assemblies.
+
+## Copy assemblies
+To copy the assemblies you can click the button in the editor. Make sure you have the Stationeers game folder set in the exporter settings.
+This action will copy over all the assemblies defined in the copy.txt file. Be aware that the game might add new assemblies in the future, so you might need to update this list.
+
+![img.png](copy_assemblies.png)
 
 ## Unity Editor 
 Once the project is imported you can check the asmdef in the Scripts folder. it should look like this:
@@ -34,7 +40,7 @@ You can get the files from [TMP_Fix.zip](TMP_Fix.zip).
 
 The TextMeshPro package requirement is included in the project definition, so after the project is opened in Unity, the package is automatically downloaded and the folder above should become available.
 
-**This is a one time patch**, since every new project will use the files from that location.
+**This is a one time patch**, since every new project will use the files from that location. It is recommended to delete your project and start again after this one time patch, since your current project still holds a bad copy of TMP.
 
 ### Building the project
 To build the mod you can open the exporter from the menu
