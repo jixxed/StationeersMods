@@ -78,7 +78,7 @@ namespace StationeersMods.Plugin
                     ChangeNote = aboutData.ChangeLog
                 };
                 ProgressPanel.ShowProgressBar(false);
-                var (success, fileId) =  await SteamTransport.Workshop_PublishItemAsync(ItemDetail);
+                var (success, fileId, result) =  await SteamTransport.Workshop_PublishItemAsync(ItemDetail);
                 HideProgressBar();
                 if (!success)
                     return;
