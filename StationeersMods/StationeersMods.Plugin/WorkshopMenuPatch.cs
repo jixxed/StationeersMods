@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml.Serialization;
 using Assets.Scripts.Networking.Transports;
 using Assets.Scripts.Serialization;
 using Assets.Scripts.UI;
@@ -52,11 +54,46 @@ namespace StationeersMods.Plugin
             SteamTransport.WorkShopItemDetail ItemDetail,
             ModData mod)
         {
-            CustomModAbout aboutData = XmlSerialization.Deserialize<CustomModAbout>(mod.AboutXmlPath, "ModMetadata");
+            CustomModAbout aboutData = Deserialize(mod.AboutXmlPath);
             aboutData.WorkshopHandle = ItemDetail.PublishedFileId;
-            aboutData.SaveXml<CustomModAbout>(mod.AboutXmlPath);
+            SaveXml(aboutData, mod.AboutXmlPath);
         }
         
+        public static CustomModAbout Deserialize(string path, string root = "ModMetadata")
+        {
+            try
+            {
+                if (!File.Exists(path))
+                    throw new FileNotFoundException("File not found at path: " + path);
+                using (StreamReader streamReader = new StreamReader(path))
+                    return (CustomModAbout) (string.IsNullOrEmpty(root) ? new XmlSerializer(typeof (CustomModAbout)) : new XmlSerializer(typeof (CustomModAbout), new XmlRootAttribute(root))).Deserialize(streamReader);
+            }
+            catch (Exception ex)
+            {
+                return default (CustomModAbout);
+            }
+        }
+        
+        public static bool SaveXml(CustomModAbout savable, string path)
+        {
+            return Serialize(savable, path);
+        }
+        
+        public static bool Serialize(CustomModAbout savable, string path)
+        {
+            try
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path))
+                {
+                    new XmlSerializer(typeof (CustomModAbout)).Serialize(streamWriter, savable);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         private static async void PublishMod(WorkshopMenu instance)
         {
             Debug.Log("Publishing Mod");

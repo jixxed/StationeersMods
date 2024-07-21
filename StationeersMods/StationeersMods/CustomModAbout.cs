@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 
 namespace StationeersMods.Plugin
 {
@@ -20,20 +21,30 @@ namespace StationeersMods.Plugin
         [XmlElement]
         public string Description;
         [XmlIgnore]
-        public string _inGameDescription;
-        [XmlElement("InGameDescription")]
+        private string _inGameDescription;
+        [XmlElement("InGameDescription", IsNullable = true)]
         public System.Xml.XmlCDataSection InGameDescription
         {
             get
             {
                 return new System.Xml.XmlDocument().CreateCDataSection(_inGameDescription);
             }
-            set
-            {
-                _inGameDescription = value.Value;
-            }
+            set => _inGameDescription = value.Value;
         }
-        [XmlElement]
+        // [XmlElement("InGameDescription")]
+        // public XmlNode InGameDescription
+        // {
+        //     get
+        //     {
+        //         XmlDocument doc = new XmlDocument();
+        //         return doc.CreateCDataSection(_inGameDescription);
+        //     }
+        //     set
+        //     {
+        //         _inGameDescription = value.Value;
+        //     }
+        // }
+        [XmlElement(IsNullable = true)] 
         public string ChangeLog;
         [XmlElement]
         public ulong WorkshopHandle;

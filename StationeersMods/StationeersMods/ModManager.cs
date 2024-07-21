@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -421,7 +422,9 @@ namespace StationeersMods
                 ModData modData = mods[index];
                 if (File.Exists(modData.AboutXmlPath))
                 {
+                    Debug.Log("Loading about data for: " + modData.LocalPath + " - " + modData.AboutXmlPath);
                     var aboutData = XmlSerialization.Deserialize<CustomModAbout>(modData.AboutXmlPath, "ModMetadata");
+                    //LogMod(aboutData);
                     if( aboutData.Version != null)//version is a string and can be null
                     {
                         available.Add(new ModVersion(aboutData.Version, aboutData.WorkshopHandle));
@@ -434,6 +437,22 @@ namespace StationeersMods
             }
 
             return available;
+        }
+
+        private static void LogMod(CustomModAbout aboutData)
+        {
+            Debug.Log("handle: " + aboutData.WorkshopHandle);
+            Debug.Log("name: " + aboutData.Name);
+            Debug.Log("author: " + aboutData.Author);
+            Debug.Log("version: " + aboutData.Version);
+            Debug.Log("description: " + aboutData.Description);
+            Debug.Log("in game description: " + aboutData.InGameDescription.Value);
+            Debug.Log("change log: " + aboutData.ChangeLog);
+            Debug.Log("tags: " + aboutData.Tags.Join((tag) => tag, ","));
+            Debug.Log("dependencies: " + aboutData.Dependencies.Join((dep) => dep.ToString(), ","));
+            Debug.Log("load before: " + aboutData.LoadBefore.Join((dep) => dep.ToString(), ","));
+            Debug.Log("load after: " + aboutData.LoadAfter.Join((dep) => dep.ToString(), ","));
+            
         }
 
         private async void AddLocalAndWorkshopItems()

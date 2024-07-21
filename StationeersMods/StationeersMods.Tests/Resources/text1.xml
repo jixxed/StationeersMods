@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Name>[JIX] Time Mod [StationeersMods]</Name>
+    <Author>Jixxed</Author>
+    <Version>0.2.4902.22241.1</Version>
+    <Description>[h1]Time Mod[/h1]
+        [b]WARNING:[/b] This is a StationeersMods Plugin Mod. It requires Bepinex to be installed with the StationeersMods plugin.
+        See: https://github.com/jixxed/StationeersMods
+
+        This mod adds the time to the days panel(bottom right) that was added to the game after being inspired by this mod.
+        Only the current day was added, so this mod now also add the time to the panel and makes it a little less transparent to make it more readable.
+
+        [h2]Change Log:[/h2]
+        [h3]Version 0.2.4902.22241.1:[/h3]
+        [list]
+        [*]Time should be correct real time on all planets now
+        [/list]
+        [h3]Version 0.2.4872.22145.1:[/h3]
+        [list]
+        [*]Fix for Shelter in Space Update
+        [*]Time is no longer solar time but real time again
+        [/list]
+        [h3]Version 0.2.4767.21868.1:[/h3]
+        [list]
+        [*]Recompile against latest version
+        [/list]
+        [h3]Version 0.2.4657.21547.2:[/h3]
+        [list]
+        [*]Add # days back
+        [/list]
+        [h3]Version 0.2.4657.21547.1:[/h3]
+        [list]
+        [*]Compile + fix for The Rocket Update
+        [/list]
+        [h3]Version 0.2.4225.19745.1:[/h3]
+        [list]
+        [*]Phase change update fix
+        [/list]
+        [h3]Version 0.2.3809.18408.1:[/h3]
+        [list]
+        [*]Initial release - ported from Addons
+        [/list]
+    </Description>
+    <ChangeLog>
+        [h3]Version 0.2.4902.22241.1:[/h3]
+        [list]
+        [*]Time should be correct real time on all planets now
+        [/list]
+    </ChangeLog>
+    <InGameDescription>
+        <![CDATA[<size="30"><color=#ffa500> Time Mod </color></size>
+                               <b>WARNING:</b> <color=#ff0000>This is a StationeersMods Plugin Mod. It requires Bepinex to be installed with the StationeersMods plugin.</color>
+                               See: https://github.com/jixxed/StationeersMods
+
+                               This mod adds the time to the days panel(bottom right) that was added to the game after being inspired by this mod.
+                               Only the current day was added, so this mod now also add the time to the panel and makes it a little less transparent to make it more readable.
+                               ]]>
+    </InGameDescription>
+    <WorkshopHandle>2930838604</WorkshopHandle>
+    <Tags />
+</ModMetadata>
