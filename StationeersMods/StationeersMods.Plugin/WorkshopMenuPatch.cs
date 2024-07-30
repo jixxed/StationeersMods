@@ -139,7 +139,7 @@ namespace StationeersMods.Plugin
                 Debug.Log("Mod description exceeds 8000 characters limit");
                 errorMessages.Add("Mod description exceeds 8000 characters limit");
             }
-            if(aboutData.ChangeLog.Length > 8000)
+            if(aboutData.ChangeLog is { Length: > 8000 })
             {
                 Debug.Log("Mod changelog exceeds 8000 characters limit");
                 errorMessages.Add("Mod changelog exceeds 8000 characters limit");
