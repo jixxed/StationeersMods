@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using Assets.Scripts.Networking.Transports;
 using Assets.Scripts.Serialization;
 using Assets.Scripts.UI;
+using Assets.Scripts.Util;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,12 @@ namespace StationeersMods.Plugin
         [HarmonyPriority(Priority.Last)]
         public static void RefreshButtonsPostfix(WorkshopMenu __instance)
         {
+            //Disable the unsubscribe button for own mods
+            if(__instance.SelectedModButtonRight.activeSelf || __instance.SelectedModButtonLeft.activeSelf)// if both are disabled -> Core
+            {
+                __instance.SelectedModButtonRight.SetActive(!__instance.SelectedModButtonLeft.activeSelf);
+            }
+            
             var selectedMod = GetSelectedModData(__instance);
             WorkshopMenu  currentInstance = __instance;
             if (!selectedMod.Data.IsLocal) return;
@@ -99,6 +106,20 @@ namespace StationeersMods.Plugin
             Debug.Log("Publishing Mod");
             ModData mod = GetSelectedModData(instance).Data;
             CustomModAbout aboutData = XmlSerialization.Deserialize<CustomModAbout>(mod.AboutXmlPath, "ModMetadata");
+            if (aboutData.Tags == null)
+            {
+                aboutData.Tags = new List<string>();
+            }
+            aboutData.Tags.RemoveAll(tag => tag.ToLower().Equals("stationeersmods") || tag.ToLower().Equals("bepinex"));
+            if (File.Exists(mod.LocalPath + "\\About\\stationeersmods"))
+            {
+                aboutData.Tags.Add("StationeersMods");
+            }
+            if (File.Exists(mod.LocalPath + "\\About\\bepinex"))
+            {
+                aboutData.Tags.Add("BepInEx");
+            }
+
             string localPath = mod.LocalPath;
             string image = localPath + "\\About\\thumb.png";
             if(IsValidModData(aboutData, image))
