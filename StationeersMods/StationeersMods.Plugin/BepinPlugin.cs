@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Assets.Scripts.UI;
 using HarmonyLib;
+using Steamworks;
+using Steamworks.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -41,13 +43,25 @@ namespace StationeersMods.Plugin
                         Harmony harmony = new Harmony("StationeersMods");
                         var refreshButtonsMethod = typeof(WorkshopMenu).GetMethod("RefreshButtons",
                             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        var refreshButtonsPostfixPrefix = typeof(WorkshopMenuPatch).GetMethod("RefreshButtonsPostfix");
-                        harmony.Patch(refreshButtonsMethod, null, new HarmonyMethod(refreshButtonsPostfixPrefix));
+                        var refreshButtonsPostfix = typeof(WorkshopMenuPatch).GetMethod("RefreshButtonsPostfix");
+                        harmony.Patch(refreshButtonsMethod, postfix: new HarmonyMethod(refreshButtonsPostfix));
 
                         var selectModMethod = typeof(WorkshopMenu).GetMethod("SelectMod",
                             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        var selectModPostfixPrefix = typeof(WorkshopMenuPatch).GetMethod("SelectModPostfix");
-                        harmony.Patch(selectModMethod, null, new HarmonyMethod(selectModPostfixPrefix));
+                        var selectModPostfix = typeof(WorkshopMenuPatch).GetMethod("SelectModPostfix");
+                        harmony.Patch(selectModMethod, postfix: new HarmonyMethod(selectModPostfix));
+                        
+                        var deleteFileAsyncMethod = typeof(SteamUGC).GetMethod(
+                            "DeleteFileAsync",
+                            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, 
+                            null, 
+                            [typeof(PublishedFileId)], 
+                            null);
+                        
+
+                        var deleteFileAsyncMethodPrefix = typeof(SteamUGCPatch).GetMethod("DeleteFileAsyncPrefix");
+                        harmony.Patch(deleteFileAsyncMethod, prefix: new HarmonyMethod(deleteFileAsyncMethodPrefix));
+
                     }
                     catch (Exception ex)
                     {

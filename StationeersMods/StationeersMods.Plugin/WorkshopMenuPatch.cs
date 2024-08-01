@@ -23,11 +23,6 @@ namespace StationeersMods.Plugin
         [HarmonyPriority(Priority.Last)]
         public static void RefreshButtonsPostfix(WorkshopMenu __instance)
         {
-            //Disable the unsubscribe button for own mods
-            if(__instance.SelectedModButtonRight.activeSelf || __instance.SelectedModButtonLeft.activeSelf)// if both are disabled -> Core
-            {
-                __instance.SelectedModButtonRight.SetActive(!__instance.SelectedModButtonLeft.activeSelf);
-            }
             
             var selectedMod = GetSelectedModData(__instance);
             WorkshopMenu  currentInstance = __instance;
@@ -119,6 +114,7 @@ namespace StationeersMods.Plugin
             {
                 aboutData.Tags.Add("BepInEx");
             }
+            SaveXml(aboutData, mod.AboutXmlPath);
 
             string localPath = mod.LocalPath;
             string image = localPath + "\\About\\thumb.png";
