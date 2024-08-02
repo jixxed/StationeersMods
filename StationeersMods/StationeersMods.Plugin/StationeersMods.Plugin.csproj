@@ -61,10 +61,12 @@
   <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
     <Compile Include="BepinPlugin.cs" />
+    <Compile Include="DynamicInvPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\AssemblyInfo.cs" />
     <Compile Include="SteamUGCPatch.cs" />
     <Compile Include="WorkshopMenuPatch.cs" />
+    <Compile Include="WorldManagerPatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StationeersMods.Cecil\StationeersMods.Cecil.csproj">

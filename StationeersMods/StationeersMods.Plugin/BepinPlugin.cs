@@ -61,7 +61,17 @@ namespace StationeersMods.Plugin
 
                         var deleteFileAsyncMethodPrefix = typeof(SteamUGCPatch).GetMethod("DeleteFileAsyncPrefix");
                         harmony.Patch(deleteFileAsyncMethod, prefix: new HarmonyMethod(deleteFileAsyncMethodPrefix));
-
+                        
+                        var addDynamicItemMethod = typeof(DynamicInvPanel).GetMethod("AddDynamicItem",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var addDynamicItemPostfix = typeof(DynamicInvPanelPatch).GetMethod("AddDynamicItemPostfix");
+                        harmony.Patch(addDynamicItemMethod, postfix: new HarmonyMethod(addDynamicItemPostfix));
+                        
+                        //patch LoadDataFilesAtPath
+                        var loadMethod = typeof(WorldManager).GetMethod("LoadDataFilesAtPath",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                        var loadPostfix = typeof(WorldManagerPatch).GetMethod("LoadDataFilesAtPathPostfix");
+                        harmony.Patch(loadMethod, postfix: new HarmonyMethod(loadPostfix));
                     }
                     catch (Exception ex)
                     {
