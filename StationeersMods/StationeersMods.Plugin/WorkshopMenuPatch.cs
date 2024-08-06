@@ -112,6 +112,7 @@ namespace StationeersMods.Plugin
             }
             if (File.Exists(mod.LocalPath + "\\About\\bepinex"))
             {
+                aboutData.Tags.Add("StationeersMods");
                 aboutData.Tags.Add("BepInEx");
             }
             SaveXml(aboutData, mod.AboutXmlPath);

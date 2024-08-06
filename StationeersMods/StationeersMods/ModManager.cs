@@ -164,7 +164,7 @@ namespace StationeersMods
         private static bool WorldManagerFix()
         {
             initMods();
-            List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
+            List<ModData> mods = WorkshopMenu.ModsConfig?.Mods != null ? WorkshopMenu.ModsConfig.Mods : new List<ModData>();
             try
             {
                 validateModOrder();
@@ -174,12 +174,12 @@ namespace StationeersMods
                     if (!modData.IsCore && modData.IsEnabled)
                     {
                         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                            .Invoke(null, new[] {modData.LocalPath + "/GameData"});
+                            ?.Invoke(null, new object[] {modData.LocalPath + "/GameData"});
                     }
                     else if (modData.IsCore)
                     {
                         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                            .Invoke(null, new[] {Application.streamingAssetsPath + "/Data"});
+                            ?.Invoke(null, new object[] {Application.streamingAssetsPath + "/Data"});
                     }
                 }
             }
