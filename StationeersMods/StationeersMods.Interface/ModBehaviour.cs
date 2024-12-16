@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using BepInEx;
+using BepInEx.Configuration;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -10,6 +13,7 @@ namespace StationeersMods.Interface
     /// </summary>
     public abstract class ModBehaviour : MonoBehaviour, IModHandler
     {
+        public ConfigFile Config { get; }
         /// <summary>
         ///     This Mod's ContentHandler, which provides the Mod's prefabs, scenes and Instantiate and AddComponent methods.
         /// </summary>
@@ -22,6 +26,17 @@ namespace StationeersMods.Interface
         public virtual void OnLoaded(ContentHandler contentHandler)
         {
             this.contentHandler = contentHandler;
+        }
+        protected ModBehaviour()
+        {
+            StationeersMod metadata = GetMetadata((object) this);
+            if (metadata != null)
+                this.Config = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath, metadata.GUID + ".cfg"), false, metadata);
+        }
+        public static StationeersMod GetMetadata(object plugin)
+        {
+            object[] customAttributes = plugin.GetType().GetCustomAttributes(typeof (StationeersMod), false);
+            return customAttributes.Length == 0 ? (StationeersMod) null : (StationeersMod) customAttributes[0];
         }
 
         /// <summary>

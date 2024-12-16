@@ -118,8 +118,12 @@
       <HintPath>$(StationeersDirectory)\rocketstation_Data\Managed\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.TextCoreTextEngineModule">
+    <Reference Include="Unity.TextMeshPro">
       <HintPath>$(StationeersDirectory)\rocketstation_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(StationeersDirectory)\rocketstation_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
@@ -133,6 +137,9 @@
     <Reference Include="UnityEngine.VideoModule">
       <HintPath>$(StationeersDirectory)\rocketstation_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(StationeersDirectory)\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

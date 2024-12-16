@@ -61,10 +61,20 @@
   <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
     <Compile Include="BepinPlugin.cs" />
-    <Compile Include="DynamicInvPanelPatch.cs" />
+    <Compile Include="Configuration\ConfigSettingEntry.cs" />
+    <Compile Include="Configuration\PropertySettingEntry.cs" />
+    <Compile Include="Configuration\SettingEntryBase.cs" />
+    <Compile Include="Configuration\SettingFieldDrawer.cs" />
+    <Compile Include="Configuration\Utilities\ComboBox.cs" />
+    <Compile Include="Configuration\Utilities\ImguiUtils.cs" />
+    <Compile Include="Configuration\Utilities\Utilities.cs" />
+    <Compile Include="Configuration\ValueChangedEventArgs.cs" />
+    <Compile Include="ModVersionInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\AssemblyInfo.cs" />
+    <Compile Include="SettingSearcher.cs" />
     <Compile Include="SteamUGCPatch.cs" />
+    <Compile Include="TextureScaler.cs" />
     <Compile Include="WorkshopMenuPatch.cs" />
     <Compile Include="WorldManagerPatch.cs" />
   </ItemGroup>

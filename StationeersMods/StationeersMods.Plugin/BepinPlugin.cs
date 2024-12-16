@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using BepInEx;
 using StationeersMods.Interface;
 using StationeersMods.Shared;
@@ -7,7 +9,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Assets.Scripts.UI;
+using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using HarmonyLib;
+using StationeersMods.Plugin.Configuration;
 using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
@@ -30,6 +35,8 @@ namespace StationeersMods.Plugin
     public class BepinPlugin : BaseUnityPlugin
     {
         //The Awake() method is run at the very start when the game is initialized.
+        public static Dictionary<string, ConfigFile> ConfigFiles = new Dictionary<string, ConfigFile>();
+        public static Dictionary<string, ModVersionInfo> ModVersionInfos = new Dictionary<string, ModVersionInfo>();
         public void Awake()
         {
             DontDestroyOnLoad(this);
@@ -58,14 +65,8 @@ namespace StationeersMods.Plugin
                             [typeof(PublishedFileId)], 
                             null);
                         
-
                         var deleteFileAsyncMethodPrefix = typeof(SteamUGCPatch).GetMethod("DeleteFileAsyncPrefix");
                         harmony.Patch(deleteFileAsyncMethod, prefix: new HarmonyMethod(deleteFileAsyncMethodPrefix));
-                        
-                        var addDynamicItemMethod = typeof(DynamicInvPanel).GetMethod("AddDynamicItem",
-                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        var addDynamicItemPostfix = typeof(DynamicInvPanelPatch).GetMethod("AddDynamicItemPostfix");
-                        harmony.Patch(addDynamicItemMethod, postfix: new HarmonyMethod(addDynamicItemPostfix));
                         
                         //patch LoadDataFilesAtPath
                         var loadMethod = typeof(WorldManager).GetMethod("LoadDataFilesAtPath",
@@ -87,8 +88,32 @@ namespace StationeersMods.Plugin
                     StartCoroutine(versionCheck());
                 }
             };
+            WorkshopModListItem.Selected += SelectMod;
         }
+        private void SelectMod(WorkshopModListItem modItem)
+        {
+            Debug.Log("Mod Path:" + modItem.Data.LocalPath);
+            try
+            {
+                ConfigFile configFile;
+                ConfigFiles.TryGetValue(modItem.Data.LocalPath, out configFile);
+                if (configFile != null)
+                {
+                    Debug.Log("Configfile found!");
+                }
+            }catch(Exception e)
+            {
+                Debug.LogError("Failed to load mod paths: " + e.Message);
+            }
 
+        }
+        public static ModBehaviour[] FindPlugins()
+        {
+            // Search for instances of BaseUnityPlugin to also find dynamically loaded plugins.
+            // Have to use FindObjectsOfType(Type) instead of FindObjectsOfType<T> because the latter is not available in some older unity versions.
+            // Still look inside Chainloader.PluginInfos in case the BepInEx_Manager GameObject uses HideFlags.HideAndDontSave, which hides it from Object.Find methods.
+            return UnityEngine.Object.FindObjectsOfType<ModBehaviour>(true).ToArray();
+        }
         public IEnumerator versionCheck()
         {
             Log("Checking for StationeersMods version...");
@@ -194,6 +219,8 @@ namespace StationeersMods.Plugin
                             Object.DontDestroyOnLoad(gobj);
                             gobj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                             {
+                                ConfigFiles.Add(mod.modDirectory, i.Config);
+                                ModVersionInfos.Add(mod.modDirectory, new ModVersionInfo(mod.name, mod.modInfo.version));
                                 i.contentHandler = mod.contentHandler;
                                 i.OnLoaded(mod.contentHandler);
                             });
@@ -223,6 +250,8 @@ namespace StationeersMods.Plugin
                                 gameObj.AddComponent(scriptType);
                                 gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                                 {
+                                    ConfigFiles.Add(mod.modDirectory, i.Config);
+                                    ModVersionInfos.Add(mod.modDirectory, new ModVersionInfo(mod.name, mod.modInfo.version));
                                     i.contentHandler = mod.contentHandler;
                                     i.OnLoaded(mod.contentHandler);
                                 });
@@ -248,6 +277,8 @@ namespace StationeersMods.Plugin
                                     gameObj.AddComponent(t);
                                     gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                                     {
+                                        ConfigFiles.Add(mod.modDirectory, i.Config);
+                                        ModVersionInfos.Add(mod.modDirectory, new ModVersionInfo(mod.name, mod.modInfo.version));
                                         i.contentHandler = ((Mod) assmod).contentHandler;
                                         i.OnLoaded(((Mod) assmod).contentHandler);
                                     });
@@ -274,6 +305,8 @@ namespace StationeersMods.Plugin
                                 gameObj.AddComponent(t);
                                 gameObj.GetComponents<ModBehaviour>().ToList().ForEach(i =>
                                 {
+                                    ConfigFiles.Add(assmod.modDirectory, i.Config);
+                                    ModVersionInfos.Add(assmod.modDirectory, new ModVersionInfo(assmod.name, ModBehaviour.GetMetadata(i).Version.ToString()));
                                     i.contentHandler = ((Mod) assmod).contentHandler;
                                     i.OnLoaded(((Mod) assmod).contentHandler);
                                 });
@@ -290,11 +323,10 @@ namespace StationeersMods.Plugin
                                     GameObject gameObj = new GameObject();
                                     Debug.Log("StationeersMods found BepinEx class: " + t.Name);
                                     gameObj.AddComponent(t);
-                                    // gameObj.GetComponents<BaseUnityPlugin>().ToList().ForEach(i =>
-                                    // {
-                                    //     i.contentHandler = mod.contentHandler;
-                                    //     i.OnLoaded(mod.contentHandler);
-                                    // });
+                                    var baseUnityPlugin = gameObj.GetComponent<BaseUnityPlugin>();
+                                    ConfigFiles.Add(assmod.modDirectory, 
+                                        baseUnityPlugin.Config);
+                                    ModVersionInfos.Add(assmod.modDirectory, new ModVersionInfo(assmod.name, baseUnityPlugin.Info.Metadata.Version.ToString()));
                                 }
                             }
                         });
@@ -310,6 +342,10 @@ namespace StationeersMods.Plugin
             mm.ModLoadCancelled += mod => { Debug.LogWarning($"Mod loading canceled: {mod.name}"); };
 
             mm.ModUnloaded += mod => { Debug.Log($"Mod UNLOADED: {mod.name}"); };
+        }
+        public void OnGUI()
+        {
+            WorkshopMenuPatch.OnGUI();
         }
     }
 }

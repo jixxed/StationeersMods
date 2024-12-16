@@ -46,6 +46,7 @@
     <Compile Include="..\AssemblyInfo.cs" />
     <Compile Include="ShaderType.cs" />
     <Compile Include="StationeersColor.cs" />
+    <Compile Include="StationeersMod.cs" />
     <Compile Include="StationeersModsUtility.cs" />
     <Compile Include="StationeersTool.cs" />
   </ItemGroup>
