@@ -56,7 +56,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
   <Import Project="$(SolutionDir)StationeersMods.VS.References.props" />
   <Import Project="$(SolutionDir)StationeersMods.VS.props" />
   <ItemGroup>
@@ -76,6 +75,7 @@
     <Compile Include="SteamUGCPatch.cs" />
     <Compile Include="TextureScaler.cs" />
     <Compile Include="WorkshopMenuPatch.cs" />
+    <Compile Include="DataCollectionPatch.cs" />
     <Compile Include="WorldManagerPatch.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -110,7 +110,6 @@
 	echo f | xcopy /s /i /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)build\StationeersMods\$(TargetName).pdb"
 	</PostBuildEvent>
   </PropertyGroup>
-  
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
