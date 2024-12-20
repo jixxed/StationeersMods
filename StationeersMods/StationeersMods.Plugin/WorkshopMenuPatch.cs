@@ -95,6 +95,9 @@ namespace StationeersMods.Plugin
                 {
                     __instance.DescriptionText.text = descriptionText;
                 }
+            }
+            if (File.Exists(selectedMod.Data.LocalPath + "\\About\\stationeersmods") || File.Exists(selectedMod.Data.LocalPath + "\\About\\bepinex"))
+            {
                 if(BepinPlugin.ConfigFiles.ContainsKey(selectedMod.Data.LocalPath))
                 {
                     _configFile = BepinPlugin.ConfigFiles[selectedMod.Data.LocalPath];
@@ -174,6 +177,10 @@ namespace StationeersMods.Plugin
         }
 
         static Vector2 scrollPosition;
+        private const string SearchBoxName = "searchBox";
+        private static bool _focusSearchBox;
+        private static string _searchString = string.Empty;
+        private const int WindowId = -68;
         // Method to define the contents of the window
         private static void DrawWindow(int windowID)
         {
@@ -188,7 +195,29 @@ namespace StationeersMods.Plugin
             guiStyle.normal.textColor = Color.white;
 
             GUILayout.Label("Mod Settings", guiStyle);
+            GUILayout.Space(8);
             
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            {
+                GUILayout.Label("Search: ", GUILayout.ExpandWidth(false));
+
+                GUI.SetNextControlName(SearchBoxName);
+                SearchString = GUILayout.TextField(SearchString, GUILayout.ExpandWidth(true));
+
+                if (_focusSearchBox)
+                {
+                    GUI.FocusWindow(WindowId);
+                    GUI.FocusControl(SearchBoxName);
+                    _focusSearchBox = false;
+                }
+
+                if (GUILayout.Button("Clear", GUILayout.ExpandWidth(false)))
+                    SearchString = string.Empty;
+
+                GUILayout.Space(8);
+            }
+            
+            GUILayout.EndHorizontal();
             scrollPosition = GUILayout.BeginScrollView(
                 scrollPosition, GUILayout.Width(450), GUILayout.Height(Screen.height - (5 * 50f)));
             
@@ -448,15 +477,41 @@ namespace StationeersMods.Plugin
             if(_configFile != null && _modVersionInfo != null)
             {
                 SettingSearcher.CollectSettings(out var results, _configFile, _modVersionInfo);
-
-                BuildFilteredSettingList(results.ToList());
+                _allSettings = results.ToList();
+                BuildFilteredSettingList();
             }
         }
 
         private static List<PluginSettingsData> _filteredSetings = new List<PluginSettingsData>();
-
-        private static void BuildFilteredSettingList(IEnumerable<SettingEntryBase> results)
+        /// <summary>
+        /// String currently entered into the search box
+        /// </summary>
+        public static string SearchString
         {
+            get => _searchString;
+            private set
+            {
+                if (value == null)
+                    value = string.Empty;
+
+                if (_searchString == value)
+                    return;
+
+                _searchString = value;
+
+                BuildFilteredSettingList();
+            }
+        }
+        private static  IEnumerable<SettingEntryBase> _allSettings;
+        private static void BuildFilteredSettingList()
+        {
+            IEnumerable<SettingEntryBase> results = _allSettings;
+            var searchStrings = SearchString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (searchStrings.Length > 0)
+            {
+                results = _allSettings.Where(x => ContainsSearchString(x, searchStrings));
+            }
             const string shortcutsCatName = "Keyboard shortcuts";
             _filteredSetings = results
                 .GroupBy(x => x.ModVersionInfo)
@@ -478,7 +533,16 @@ namespace StationeersMods.Plugin
                 .OrderBy(x => x.Info.Name)
                 .ToList();
         }
+        private static bool ContainsSearchString(SettingEntryBase setting, string[] searchStrings)
+        {
+            var combinedSearchTarget = setting.DispName + "\n" +
+                                       setting.Category + "\n" +
+                                       setting.Description + "\n" +
+                                       setting.DefaultValue + "\n" +
+                                       setting.Get();
 
+            return searchStrings.All(s => combinedSearchTarget.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0);
+        }
         private sealed class PluginSettingsData
         {
             public ModVersionInfo Info;
