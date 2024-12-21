@@ -23,7 +23,10 @@ namespace StationeersMods.Editor
             {
                 Patcher.CheckDevelopmentMode(settings);
             }
-            catch(ArgumentException ex){ /* ignore */ }
+            catch (ArgumentException ex)
+            {
+                /* ignore */
+            }
         }
 
         public bool Draw(ExportSettings settings)
@@ -69,17 +72,23 @@ namespace StationeersMods.Editor
             settings.WaitForDebugger = EditorGUILayout.Toggle("", settings.WaitForDebugger, GUILayout.Width(20));
             EditorGUILayout.LabelField("This setting is applied when development mode is enabled");
             GUILayout.EndHorizontal();
-        
+
             // Development mode
             GUILayout.BeginHorizontal();
-            
+
             try
             {
                 Patcher.CheckDevelopmentMode(settings);
             }
-            catch(ArgumentException ex){ /* ignore */ }
+            catch (ArgumentException ex)
+            {
+                /* ignore */
+            }
+
             EditorGUILayout.LabelField("Stationeers mode:", GUILayout.Width(200));
-            EditorGUILayout.LabelField(!Patcher.DevelopmentModeEnabled.HasValue ? "Unknown. Did you configure the Stationeers directory?" : (Patcher.DevelopmentModeEnabled.Value ? "Development" : "Release"));
+            EditorGUILayout.LabelField(!Patcher.DevelopmentModeEnabled.HasValue
+                ? "Unknown. Did you configure the Stationeers directory?"
+                : (Patcher.DevelopmentModeEnabled.Value ? "Development" : "Release"));
 
             GUILayout.EndHorizontal();
 
@@ -89,8 +98,12 @@ namespace StationeersMods.Editor
             if (!Patcher.DevelopmentModeEnabled.HasValue)
             {
                 GUI.enabled = false;
-                GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35));
-                GUI.enabled = true;
+
+                EditorApplication.delayCall += () =>
+                {
+                    GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35));
+                    GUI.enabled = true;
+                };
             }
             else
             {
@@ -98,46 +111,57 @@ namespace StationeersMods.Editor
                 {
                     if (GUILayout.Button("Enable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
                     {
-                        try
+                        EditorApplication.delayCall += () =>
                         {
-                            Patcher.SetDevelopmentMode(settings, true);
-                        }
-                        catch(ArgumentException ex)
-                        {
-                            EditorUtility.DisplayDialog("Error", ex.Message, "OK");
-                        }
+                            try
+                            {
+                                Patcher.SetDevelopmentMode(settings, true);
+                            }
+                            catch (ArgumentException ex)
+                            {
+                                EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                            }
+                        };
                     }
                 }
                 else
                 {
                     if (GUILayout.Button("Disable development mode", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
                     {
-                        try
+                        EditorApplication.delayCall += () =>
                         {
-                            Patcher.SetDevelopmentMode(settings, false);
-                        }
-                        catch(ArgumentException ex)
-                        {
-                            EditorUtility.DisplayDialog("Error", ex.Message, "OK");
-                        }
+                            try
+                            {
+                                Patcher.SetDevelopmentMode(settings, false);
+                            }
+                            catch (ArgumentException ex)
+                            {
+                                EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                            }
+                        };
                     }
                 }
             }
+
             GUILayout.EndHorizontal();
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Copy game assemblies to project", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
             {
-                try
+                EditorApplication.delayCall += () =>
                 {
-                    CopyAssemblies(settings);
-                    EditorUtility.DisplayDialog("Complete", "All files have been copied.", "OK");
-                }
-                catch(ArgumentException ex)
-                {
-                    EditorUtility.DisplayDialog("Error", ex.Message, "OK");
-                }
+                    try
+                    {
+                        CopyAssemblies(settings);
+                        EditorUtility.DisplayDialog("Complete", "All files have been copied.", "OK");
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                    }
+                };
             }
+
             GUILayout.EndHorizontal();
             return true;
         }
@@ -148,12 +172,14 @@ namespace StationeersMods.Editor
             {
                 throw new ArgumentException("Did you configure the Stationeers directory? Could not find " + settings.StationeersDirectory);
             }
+
             var assembliesFolder = Path.Combine(Application.dataPath, "Assemblies");
             var assemblies = Path.Combine(assembliesFolder, "copy.txt");
             if (!File.Exists(assemblies))
             {
                 throw new ArgumentException("Could not find " + assemblies);
             }
+
             List<string> errors = new List<string>();
             foreach (var line in File.ReadLines(assemblies))
             {
@@ -161,19 +187,19 @@ namespace StationeersMods.Editor
                 {
                     continue;
                 }
+
                 var assemblyToCopy = Path.Combine(settings.StationeersDirectory, line);
 
                 if (File.Exists(assemblyToCopy))
                 {
                     Debug.Log("Copy: " + assemblyToCopy + " to " + assembliesFolder);
-                    File.Copy(assemblyToCopy,Path.Combine(assembliesFolder, Path.GetFileName(assemblyToCopy)),true);
+                    File.Copy(assemblyToCopy, Path.Combine(assembliesFolder, Path.GetFileName(assemblyToCopy)), true);
                 }
                 else
                 {
                     Debug.LogError("Error: " + assemblyToCopy + " doesn't exist");
                     errors.Add(assemblyToCopy);
                 }
-
             }
 
             if (errors.Count > 0)

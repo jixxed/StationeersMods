@@ -87,15 +87,18 @@ namespace StationeersMods.Editor
 
                 if (GUILayout.Button("Save & Export", GUILayout.Height(30)))
                 {
-                    Export.ExportMod(settings);
+                    EditorApplication.delayCall += () => Export.ExportMod(settings);
                 }
 
                 GUILayout.Space(5);
 
                 if (GUILayout.Button("Save & Export & Run", GUILayout.Height(30)))
                 {
-                    Export.ExportMod(settings);
-                    Export.RunGame(settings);
+                    EditorApplication.delayCall += () =>
+                    {
+                        Export.ExportMod(settings);
+                        Export.RunGame(settings);
+                    };
                 }
 
                 GUILayout.Space(50);
