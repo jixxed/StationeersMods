@@ -234,18 +234,32 @@ namespace StationeersMods
 
         private static async void initMods()
         {
-            foreach (SteamTransport.ItemWrapper localAndWorkshopItem in (IEnumerable<SteamTransport.ItemWrapper>) await NetworkManager.GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod))
+            var items = await GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod);
+
+            List<ulong> addedHandles = new List<ulong>();
+            foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items.OrderBy(wrapper => wrapper.IsLocal()).Reverse())
             {
                 SteamTransport.ItemWrapper item = localAndWorkshopItem;
-                try
+                ulong workshopHandle = 0;
+                if(File.Exists(item.DirectoryPath + "\\About\\About.xml"))
                 {
-                    if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.LocalPath != item.DirectoryPath)))
-                        WorkshopMenu.ModsConfig.Mods.Add(new ModData(item, true));
+                    var modAbout = XmlSerialization.Deserialize<ModAbout>(item.DirectoryPath + "\\About\\About.xml", "ModMetadata");
+                    workshopHandle = modAbout.WorkshopHandle;
                 }
-                catch (Exception ex)
+                if (!addedHandles.Contains(workshopHandle))
                 {
-                    ConsoleWindow.PrintError(string.Format("Error loading mod with id {0}", (object) item.Id), false);
-                    ConsoleWindow.PrintError(ex.Message, false);
+                    if(workshopHandle != 0) // 0 indicates no workshophandle
+                        addedHandles.Add(workshopHandle);
+                    try
+                    {
+                        if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.LocalPath != item.DirectoryPath)))
+                            WorkshopMenu.ModsConfig.Mods.Add(new ModData(item, true));
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleWindow.PrintError(string.Format("Error loading mod with id {0}", (object) item.Id), false);
+                        ConsoleWindow.PrintError(ex.Message, false);
+                    }
                 }
             }
 
@@ -478,22 +492,38 @@ namespace StationeersMods
             {
                 var items = await GetLocalAndWorkshopItems(SteamTransport.WorkshopType.Mod);
 
-
-                foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items)
+                List<ulong> addedHandles = new List<ulong>();
+                foreach (SteamTransport.ItemWrapper localAndWorkshopItem in items.OrderBy(wrapper => wrapper.IsLocal()).Reverse())
                 {
                     SteamTransport.ItemWrapper item = localAndWorkshopItem;
-                    if (File.Exists(item.DirectoryPath + "\\About\\stationeersmods"))
+                    ulong workshopHandle = 0;
+                    if(File.Exists(item.DirectoryPath + "\\About\\About.xml"))
                     {
-                        Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " +
-                                  item.Title);
-                        AddSearchDirectory(item.DirectoryPath);
+                        var modAbout = XmlSerialization.Deserialize<ModAbout>(item.DirectoryPath + "\\About\\About.xml", "ModMetadata");
+                        workshopHandle = modAbout.WorkshopHandle;
                     }
-
-                    if (File.Exists(item.DirectoryPath + "\\About\\bepinex"))
+                    if (!addedHandles.Contains(workshopHandle))
                     {
-                        Debug.Log("BepInEx mod found in directory: " + item.DirectoryPath + ". name: " +
-                                  item.Title);
-                        AddSearchDirectory(item.DirectoryPath);
+                        if(workshopHandle != 0) // 0 indicates no workshophandle
+                            addedHandles.Add(workshopHandle);
+
+                        if (File.Exists(item.DirectoryPath + "\\About\\stationeersmods"))
+                        {
+                            Debug.Log("StationeersMods mod found in directory: " + item.DirectoryPath + ". name: " +
+                                      item.Title);
+                            AddSearchDirectory(item.DirectoryPath);
+                        }
+
+                        if (File.Exists(item.DirectoryPath + "\\About\\bepinex"))
+                        {
+                            Debug.Log("BepInEx mod found in directory: " + item.DirectoryPath + ". name: " +
+                                      item.Title);
+                            AddSearchDirectory(item.DirectoryPath);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Skipping duplicate mod: " + item.Title);
                     }
                 }
             }
