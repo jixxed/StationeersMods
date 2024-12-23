@@ -100,3 +100,11 @@ The word `ExampleMod` should **NOT** appear anywhere before you publish. The sce
 there is a `stationeersmods` file in the `About` folder. This file is mandatory for StationeersMods mods as a way to recognize the mod needs to be processed as a StationeersMods mod.
 
 An overlay image is provided for you to use to create your own thumbnail.
+
+# Upload to Steam Workshop
+
+To upload your mod to steam, go to the workshop menu in the main menu of the game. Select your mod and click Publish.
+After you have published your mod, the `About.xml` file in the local mods folder will be updated with the workshop handle. You can also find this handle in the workshop url.
+Copy this handle and add it in the `About.xml` inside your project.
+
+WARNING: If you don't do this, the next time you publish, the mod will be uploaded as a new mod!
