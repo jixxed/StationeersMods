@@ -646,7 +646,7 @@ namespace StationeersMods
             {
                 queuedRefreshMods.Remove(_mod);
                 if (_mod is Mod modm)
-                    OnModChanged(modm.modInfo.path);
+                    OnModChanged(modm.modBaseDirectory, modm.modInfo.path);
             }
         }
 
@@ -679,7 +679,7 @@ namespace StationeersMods
         /// <param name="path">The path of the search directory.</param>
         public void AddSearchDirectory(string path)
         {
-            if (searchDirectories.Any(s => s.path.NormalizedPath() == path.NormalizedPath()))
+            if (searchDirectories.Any(s => s.BasePath.NormalizedPath() == path.NormalizedPath()))
                 return;
 
             var directory = new ModSearchDirectory(path);
@@ -699,7 +699,7 @@ namespace StationeersMods
         /// <param name="path">The path of the search directory.</param>
         public void RemoveSearchDirectory(string path)
         {
-            var directory = searchDirectories.Find(s => s.path.NormalizedPath() == path.NormalizedPath());
+            var directory = searchDirectories.Find(s => s.BasePath.NormalizedPath() == path.NormalizedPath());
 
             if (directory == null)
                 return;
@@ -727,27 +727,27 @@ namespace StationeersMods
             }
         }
 
-        private void OnModFound(string path)
+        private void OnModFound(string modBasePath, string path)
         {
             //AddMod(path);
-            ThreadPool.QueueUserWorkItem(o => AddMod(path));
+            ThreadPool.QueueUserWorkItem(o => AddMod(modBasePath,path));
         }
 
-        private void OnModRemoved(string path)
+        private void OnModRemoved(string modBasePath, string path)
         {
             RemoveMod(path);
         }
 
-        private void OnModChanged(string path)
+        private void OnModChanged(string modBasePath, string path)
         {
-            RefreshMod(path);
+            RefreshMod(modBasePath, path);
         }
 
-        private void RefreshMod(string path)
+        private void RefreshMod(string modBasePath, string path)
         {
             LogUtility.LogInfo("Mod refreshing: " + path);
-            OnModRemoved(path);
-            OnModFound(path);
+            OnModRemoved(modBasePath, path);
+            OnModFound(modBasePath, path);
         }
 
         private void QueueModRefresh(AssemblyMod mod)
@@ -760,7 +760,7 @@ namespace StationeersMods
             queuedRefreshMods.Add(mod);
         }
 
-        private void AddMod(string path)
+        private void AddMod(string modBasePath, string path)
         {
             lock (_lock)
             {
@@ -769,7 +769,7 @@ namespace StationeersMods
             }
 
             Debug.Log("creating new Mod from " + path);
-            var mod = (path.EndsWith(".info")) ? new Mod(path) : new AssemblyMod(path);
+            var mod = (path.EndsWith(".info")) ? new Mod(modBasePath, path) : new AssemblyMod(modBasePath, path);
 
             lock (_lock)
             {

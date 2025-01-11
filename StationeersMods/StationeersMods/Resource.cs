@@ -17,14 +17,16 @@ namespace StationeersMods
 
         private LoadState _loadState;
 
+        public String modBaseDirectory { get; protected set; }
         public String modDirectory { get; protected set; }
         /// <summary>
         ///     Initialize a Resource with a name.
         /// </summary>
         /// <param name="name">The Resource's name</param>
-        protected Resource(string name, string modDirectory)
+        protected Resource(string name, string modBaseDirectory, string modDirectory)
         {
             this.modDirectory = modDirectory;
+            this.modBaseDirectory = modBaseDirectory;
             this.name = name;
             _loadState = new UnloadedState(this);
         }

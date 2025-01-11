@@ -38,7 +38,7 @@ namespace StationeersMods
         ///     Initialize a new Mod with a path to a mod file.
         /// </summary>
         /// <param name="path">The path to a mod file</param>
-        public Mod(string path) : base(path)
+        public Mod(string modBaseDirectory, string path) : base(modBaseDirectory, path)
         {
             modInfo = ModInfo.Load(path);
 
@@ -54,9 +54,9 @@ namespace StationeersMods
                 var scenesPath = Path.Combine(platformDirectory, modInfo.name.ToLower() + ".scenes");
 
                 if (File.Exists(assetsPath))
-                    assetsResource = new AssetBundleResource(name + " assets", assetsPath, modDirectory);
+                    assetsResource = new AssetBundleResource(name + " assets", modBaseDirectory, assetsPath, modDirectory);
                 if (File.Exists(scenesPath))
-                    scenesResource = new AssetBundleResource(name + " scenes", scenesPath, modDirectory);
+                    scenesResource = new AssetBundleResource(name + " scenes", modBaseDirectory, scenesPath, modDirectory);
             }
 
             // isValid = true;
@@ -162,7 +162,7 @@ namespace StationeersMods
                 scenesResource.Loaded += OnScenesResourceLoaded;
                 foreach (var sceneName in sceneNames)
                 {
-                    var modScene = new ModScene(sceneName, this, this.modDirectory);
+                    var modScene = new ModScene(sceneName, this, this.modBaseDirectory, this.modDirectory);
 
                     modScene.Loaded += OnSceneLoaded;
                     modScene.Unloaded += OnSceneUnloaded;

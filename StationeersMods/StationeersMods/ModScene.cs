@@ -15,7 +15,7 @@ namespace StationeersMods
         /// </summary>
         /// <param name="name">The scene's name</param>
         /// <param name="mod">The Mod this ModScene belongs to.</param>
-        public ModScene(string name, AssemblyMod mod, string path) : base(name, path)
+        public ModScene(string name, AssemblyMod mod, string modBasePath, string path) : base(name, modBasePath, path)
         {
             this.mod = mod;
             scene = null;

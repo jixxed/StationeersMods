@@ -11,9 +11,8 @@ If you are here to download the latest release for your gameplay you need the fo
 ### Installation
 
 StationeersMods is a Bepinex plugin, so it is installed just like any other. StationeersMods will load mods you subscribed to from the workshop.
-- If you haven't installed Bepinex (5.4.21) for the game: [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
+- If you haven't installed Bepinex (5.4.23.2 is the latest supported at time of writing. 6.0 is not yet supported) for the game: [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
 - Download the latest `StationeersMods.zip` from [Releases](https://github.com/jixxed/StationeersMods/releases) and extract the zip to your `BepInEx/plugins/` folder
-- Edit \BepInEx\config\BepInEx.cfg and change `[Chainloader] HideManagerGameObject` to `true` or set `[Preloader.Entrypoint] Type` to `MonoBehaviour`. Either option should work.
 - Install your mods from the workshop and play the game
 
 If you have questions you can ask them on [Discord](https://discord.gg/AEmQR3XCGm).

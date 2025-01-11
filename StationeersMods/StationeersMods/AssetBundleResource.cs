@@ -12,7 +12,7 @@ namespace StationeersMods
     {
         private bool _canLoad;
 
-        public AssetBundleResource(string name, string path, string modDirectory) : base(name, modDirectory)
+        public AssetBundleResource(string name, string modBasePath, string path, string modDirectory) : base(name, modBasePath, modDirectory)
         {
             this.path = path;
 

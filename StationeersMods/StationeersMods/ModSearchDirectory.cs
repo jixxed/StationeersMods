@@ -24,10 +24,10 @@ namespace StationeersMods
         /// <param name="path">The path to the search directory.</param>
         public ModSearchDirectory(string path)
         {
-            this.path = Path.GetFullPath(path);
+            this.BasePath = Path.GetFullPath(path);
 
-            if (!Directory.Exists(this.path))
-                throw new DirectoryNotFoundException(this.path);
+            if (!Directory.Exists(this.BasePath))
+                throw new DirectoryNotFoundException(this.BasePath);
 
             _modPaths = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
 
@@ -40,7 +40,7 @@ namespace StationeersMods
         /// <summary>
         ///     This ModSearchDirectory's path.
         /// </summary>
-        public string path { get; }
+        public string BasePath { get; }
 
         /// <summary>
         ///     Releases all resources used by the ModSearchDirectory.
@@ -59,17 +59,17 @@ namespace StationeersMods
         /// <summary>
         ///     Occurs when a new Mod has been found.
         /// </summary>
-        public event Action<string> ModFound;
+        public event Action<string,string> ModFound;
 
         /// <summary>
         ///     Occurs when a Mod has been removed.
         /// </summary>
-        public event Action<string> ModRemoved;
+        public event Action<string,string> ModRemoved;
 
         /// <summary>
         ///     Occurs when a change to a Mod's directory has been detected.
         /// </summary>
-        public event Action<string> ModChanged;
+        public event Action<string,string> ModChanged;
 
         /// <summary>
         ///     Occurs when any change was detected for any Mod in this search directory.
@@ -177,7 +177,7 @@ namespace StationeersMods
 
             _modPaths.Add(path, DateTime.Now.Ticks);
 
-            ModFound?.Invoke(path);
+            ModFound?.Invoke(GetSubFolderPath(this.BasePath, path), path);
         }
 
         private void RemoveModPath(string path)
@@ -186,7 +186,7 @@ namespace StationeersMods
                 return;
 
             _modPaths.Remove(path);
-            ModRemoved?.Invoke(path);
+            ModRemoved?.Invoke(GetSubFolderPath(this.BasePath, path), path);
         }
 
         private void UpdateModPath(string path)
@@ -196,16 +196,33 @@ namespace StationeersMods
                 RemoveModPath(path);
                 return;
             }
-
-            ModChanged?.Invoke(path);
+            
+            ModChanged?.Invoke(GetSubFolderPath(this.BasePath, path), path);
         }
+        public string GetSubFolderPath(string basePath, string path)
+        {
+            var baseUri = new Uri(basePath);
+            var pathUri = new Uri(path);
 
+            if (baseUri.IsBaseOf(pathUri))
+            {
+                var relativeUri = baseUri.MakeRelativeUri(pathUri);
+                var segments = relativeUri.ToString().Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (segments.Length > 0)
+                {
+                    return Path.Combine(basePath, segments[0]);
+                }
+            }
+
+            return path;
+        }
         private string[] GetModInfoPaths()
         {
-            string[] paths = Directory.GetFiles(path, "*.info", SearchOption.AllDirectories);
+            string[] paths = Directory.GetFiles(BasePath, "*.info", SearchOption.AllDirectories);
             if (paths.Length == 0)
             {
-                paths = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
+                paths = Directory.GetFiles(BasePath, "*.dll", SearchOption.AllDirectories);
             }
 
             return paths;
