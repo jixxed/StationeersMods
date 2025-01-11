@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using System.IO.Compression;
 
 namespace StationeersMods.Plugin
 {
@@ -42,6 +43,10 @@ namespace StationeersMods.Plugin
         public void Awake()
         {
             DontDestroyOnLoad(this);
+            
+            // Cleanup temporary and backup DLL files from previous updates
+            CleanupUpdateFiles();
+
             bool isPatched = PatchBepInEx();
             SceneManager.sceneLoaded += (Scene, LoadSceneMode) =>
             {
@@ -66,7 +71,7 @@ namespace StationeersMods.Plugin
                             "DeleteFileAsync",
                             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
                             null,
-                            [typeof(PublishedFileId)],
+                            new Type[] { typeof(PublishedFileId) },
                             null);
 
                         var deleteFileAsyncMethodPrefix = typeof(SteamUGCPatch).GetMethod("DeleteFileAsyncPrefix");
@@ -121,6 +126,7 @@ namespace StationeersMods.Plugin
             }
             catch (Exception e)
             {
+                Debug.LogError($"Error selecting mod: {e.Message}");
                 AlertPanel.Instance.ShowAlert("BepInEx config has been patched and requires a game restart NOW!", AlertState.Alert);
             }
         }
@@ -151,18 +157,26 @@ namespace StationeersMods.Plugin
                     if (matches.Count > 0)
                     {
                         var @group = matches[0].Groups[1];
-                        string currentVersion = @group.Value;
+                        string latestVersion = @group.Value;
                         System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                         System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-                        string version = "V" + fvi.FileVersion;
-                        Log($"Latest StationeersMods version is {currentVersion}. Installed {version}");
+                        string currentVersion = "V" + fvi.FileVersion;
+                        Log($"Latest StationeersMods version is {latestVersion}. Installed {currentVersion}");
 
                         // If the current version is the same as the latest one, just exit the coroutine.
-                        if (version.ToLower().Equals(currentVersion.ToLower()))
+                        Version current = new Version(fvi.FileVersion);
+                        Version latest = new Version(latestVersion.TrimStart('V', 'v'));
+
+                        if (current >= latest)
+                        {
                             yield break;
+                        }
 
                         Log("New version of StationeersMods is available!");
-                        AlertPanel.Instance.ShowAlert($"New version of StationeersMods: ({currentVersion}) is available!", AlertState.Alert);
+                        AlertPanel.Instance.ShowAlert($"New version of StationeersMods: ({latestVersion}) is available!", AlertState.Alert);
+
+                        // Self-update logic
+                        yield return StartCoroutine(SelfUpdateMod(latestVersion));
                     }
                     else
                     {
@@ -184,6 +198,241 @@ namespace StationeersMods.Plugin
                         yield return null;
                 }
             }
+        }
+
+        private IEnumerator SelfUpdateMod(string newVersion)
+        {
+            Log($"Attempting to download and update to version {newVersion}");
+
+            // Fetch the latest release details
+            UnityWebRequest webRequest = UnityWebRequest.Get("https://api.github.com/repos/jixxed/StationeersMods/releases/latest");
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to fetch release details. Error: {webRequest.error}");
+                AlertPanel.Instance.ShowAlert("Failed to check for updates.", AlertState.Alert);
+                yield break;
+            }
+
+            // Find the ZIP asset in the release
+            Regex zipRx = new Regex(@"""browser_download_url""\:\s""([^""]*StationeersMods\.zip)""", 
+                RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            MatchCollection zipMatches = zipRx.Matches(webRequest.downloadHandler.text);
+
+            if (zipMatches.Count == 0)
+            {
+                Debug.LogError("Could not find ZIP in the latest release.");
+                AlertPanel.Instance.ShowAlert("Could not find update package.", AlertState.Alert);
+                yield break;
+            }
+
+            string zipDownloadUrl = zipMatches[0].Groups[1].Value;
+            
+            // Download the ZIP file
+            UnityWebRequest zipDownloadRequest = UnityWebRequest.Get(zipDownloadUrl);
+            yield return zipDownloadRequest.SendWebRequest();
+
+            if (zipDownloadRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to download update ZIP. Error: {zipDownloadRequest.error}");
+                AlertPanel.Instance.ShowAlert("Failed to download StationeersMods update.", AlertState.Alert);
+                yield break;
+            }
+
+            // List of DLLs to update
+            string[] dllsToUpdate = new[]
+            {
+                "StationeersMods.Cecil.dll",
+                "StationeersMods.dll",
+                "StationeersMods.Interface.dll",
+                "StationeersMods.Patcher.dll",
+                "StationeersMods.Plugin.dll",
+                "StationeersMods.Shared.dll"
+            };
+
+            // Create a temporary directory for extraction
+            string tempDir = Path.Combine(Path.GetTempPath(), "StationeersMods_Update");
+            Directory.CreateDirectory(tempDir);
+
+            // Save the downloaded ZIP
+            string tempZipPath = Path.Combine(tempDir, "StationeersMods.zip");
+            File.WriteAllBytes(tempZipPath, zipDownloadRequest.downloadHandler.data);
+
+            // Handle DLL updates
+            yield return StartCoroutine(UpdateDlls(tempZipPath, dllsToUpdate, newVersion));
+
+            // Clean up temporary files
+            try 
+            {
+                File.Delete(tempZipPath);
+                Directory.Delete(tempDir, true);
+                AlertPanel.Instance.ShowAlert($"StationeersMods updated to version {newVersion}. Please restart NOW.", AlertState.Alert);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to clean up update files: {ex.Message}");
+                AlertPanel.Instance.ShowAlert("Update completed, but failed to clean up temporary files.", AlertState.Alert);
+            }
+        }
+
+        private IEnumerator UpdateDlls(string zipPath, string[] dllsToUpdate, string newVersion)
+        {
+            // Create lists to track update results outside of try-catch
+            var successfulUpdates = new List<string>();
+            var failedUpdates = new List<string>();
+
+            // Open the archive before processing
+            using (var archive = System.IO.Compression.ZipFile.OpenRead(zipPath))
+            {
+                // Process each DLL
+                foreach (string dllName in dllsToUpdate)
+                {
+                    // Find the entry in the archive
+                    var entry = archive.Entries.FirstOrDefault(e => e.Name == dllName);
+                    if (entry == null)
+                    {
+                        failedUpdates.Add(dllName);
+                        yield return null;
+                        continue;
+                    }
+
+                    // Find the current DLL path
+                    string currentDllPath = FindDllPath(dllName);
+                    if (string.IsNullOrEmpty(currentDllPath))
+                    {
+                        failedUpdates.Add(dllName);
+                        yield return null;
+                        continue;
+                    }
+
+                    // Attempt to replace the DLL
+                    bool updateSuccessful = ForceDllReplacement(currentDllPath, entry, dllName);
+
+                    // Track the result
+                    if (updateSuccessful)
+                    {
+                        successfulUpdates.Add(dllName);
+                        Log($"Successfully updated {dllName} to version {newVersion}");
+                    }
+                    else
+                    {
+                        failedUpdates.Add(dllName);
+                    }
+
+                    // Yield to prevent freezing
+                    yield return null;
+                }
+            }
+
+            // Show alert if any updates failed
+            if (failedUpdates.Any())
+            {
+                string failedDllList = string.Join(", ", failedUpdates);
+                AlertPanel.Instance.ShowAlert($"Some DLLs could not be updated: {failedDllList}. Please manually update or restart.", AlertState.Alert);
+            }
+        }
+
+        private bool ForceDllReplacement(string currentDllPath, System.IO.Compression.ZipArchiveEntry entry, string dllName)
+        {
+            string backupDllPath = currentDllPath + ".bak";
+            string tempDllPath = currentDllPath + ".temp";
+
+            // Attempt to create a backup
+            try 
+            {
+                if (File.Exists(backupDllPath))
+                {
+                    File.Delete(backupDllPath);
+                }
+                File.Copy(currentDllPath, backupDllPath, true);
+            }
+            catch 
+            {
+                // Silently ignore backup failures
+            }
+
+            // Force DLL replacement using multiple strategies
+            try 
+            {
+                // Strategy 1: Extract directly to the file
+                using (var fileStream = new FileStream(currentDllPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    entry.Open().CopyTo(fileStream);
+                }
+                return true;
+            }
+            catch 
+            {
+                try 
+                {
+                    // Strategy 2: Rename existing DLL and replace
+                    File.Move(currentDllPath, tempDllPath);
+                    
+                    try 
+                    {
+                        using (var fileStream = new FileStream(currentDllPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            entry.Open().CopyTo(fileStream);
+                        }
+                        
+                        // Successfully replaced, delete temp file
+                        File.Delete(tempDllPath);
+                        return true;
+                    }
+                    catch
+                    {
+                        // Restore original DLL if replacement fails
+                        try 
+                        {
+                            File.Move(tempDllPath, currentDllPath);
+                        }
+                        catch 
+                        {
+                            // Silently ignore restoration failures
+                        }
+                        return false;
+                    }
+                }
+                catch 
+                {
+                    // Silently ignore rename failures
+                    return false;
+                }
+            }
+        }
+
+        private string FindDllPath(string dllName)
+        {
+            // Try to find the DLL in the current directory or BepInEx plugin directories
+            string[] searchPaths = new[]
+            {
+                AppDomain.CurrentDomain.BaseDirectory,
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx", "plugins"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx", "core")
+            };
+
+            foreach (string searchPath in searchPaths)
+            {
+                if (Directory.Exists(searchPath))
+                {
+                    string dllPath = Directory.GetFiles(searchPath, dllName, SearchOption.AllDirectories)
+                        .FirstOrDefault();
+
+                    if (!string.IsNullOrEmpty(dllPath))
+                    {
+                        return dllPath;
+                    }
+                }
+            }
+
+            // Fallback to the path of the currently executing assembly if no other path is found
+            if (dllName == "StationeersMods.Plugin.dll")
+            {
+                return Assembly.GetExecutingAssembly().Location;
+            }
+
+            return null;
         }
 
         private void Log(string message)
@@ -418,6 +667,64 @@ namespace StationeersMods.Plugin
             }
 
             return needsPatching;
+        }
+
+        private void CleanupUpdateFiles()
+        {
+            // List of DLLs to clean up
+            string[] dllsToCleanup = new[]
+            {
+                "StationeersMods.Cecil.dll",
+                "StationeersMods.dll",
+                "StationeersMods.Interface.dll",
+                "StationeersMods.Patcher.dll",
+                "StationeersMods.Plugin.dll",
+                "StationeersMods.Shared.dll"
+            };
+
+            // Search paths for cleanup
+            string[] searchPaths = new[]
+            {
+                AppDomain.CurrentDomain.BaseDirectory,
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx", "plugins"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx", "core")
+            };
+
+            // Cleanup temp and backup files
+            foreach (string searchPath in searchPaths)
+            {
+                if (!Directory.Exists(searchPath)) continue;
+
+                foreach (string dllName in dllsToCleanup)
+                {
+                    try 
+                    {
+                        // Find all matching DLLs
+                        string[] dllPaths = Directory.GetFiles(searchPath, dllName, SearchOption.AllDirectories);
+                        
+                        foreach (string dllPath in dllPaths)
+                        {
+                            // Remove .bak files
+                            string backupPath = dllPath + ".bak";
+                            if (File.Exists(backupPath))
+                            {
+                                File.Delete(backupPath);
+                            }
+
+                            // Remove .temp files
+                            string tempPath = dllPath + ".temp";
+                            if (File.Exists(tempPath))
+                            {
+                                File.Delete(tempPath);
+                            }
+                        }
+                    }
+                    catch 
+                    {
+                        // Silently ignore any cleanup errors
+                    }
+                }
+            }
         }
     }
 }
