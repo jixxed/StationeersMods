@@ -1,12 +1,12 @@
 # Creating a unity mod
 
 This guide will help you build your first mod and load it in the game. You can adapt it afterwards to your needs.
-This guide is written Unity version 2021.2.13f1.
 
 ## Import template
 Download the [ExampleMod](https://github.com/StationeersMods/ExampleMod). This contains a working starter mod you can easily adapt.
 
-- Copy the project into a project folder (ex. ExampleMod)
+- Using Unity 2022.3.7f1, create a 3d Built-In Render Pipeline project for your mod
+- Copy the ExampleMod project into your project folder
 - In Assets/Assemblies there is a copy.txt file. This contains a list of dll's you need to copy over. This can be done with the click of a button inside the Unity Editor.
 - In Assets/StationeersMods is the exporter plugin for Unity. You should update this with the latest version of StationeersMods-exporter.zip from [Github](https://github.com/jixxed/StationeersMods/releases).
 - Open the folder in the Unity Hub and open the project.
@@ -18,7 +18,7 @@ If the project fails to compile you will get an error:
 You can click Ignore and try to fix the issues. This will usually be related to changes in the assemblies.
 
 ## Copy assemblies
-To copy the assemblies you can click the button in the editor. Make sure you have the Stationeers game folder set in the exporter settings.
+To copy the assemblies you can click the button in the editor, under StationeersMods -> Export Settings. Make sure you have the Stationeers game folder set in the exporter settings.
 This action will copy over all the assemblies defined in the copy.txt file. Be aware that the game might add new assemblies in the future, so you might need to update this list.
 
 ![img.png](copy_assemblies.png)
@@ -67,6 +67,8 @@ Fill in the settings:
 
 On the **Assemblies** tab add the .asmdef file
 
+Note that you do need to click the + icon, even if it automatically selected the file
+
 ![Image](export_settings2.png)
 
 Back on the Export tab you can click export and your mod should be built into the output directory.
@@ -97,9 +99,13 @@ To make the mod your own, replace ExampleMod **EVERYWHERE** with your own name.
 You can do this at the beginning, after extraction, by editing the files in the `Scripts` folder and the scene in the `Scenes` folder, before importing the project in Unity. 
 The word `ExampleMod` should **NOT** appear anywhere before you publish. The scene also needs to have a unique name, otherwise it might conflict with other mods.
 
+This should be done automatically if you used init.bat or init.sh as mentioned in the ExampleMod instructions
+
 there is a `stationeersmods` file in the `About` folder. This file is mandatory for StationeersMods mods as a way to recognize the mod needs to be processed as a StationeersMods mod.
 
-An overlay image is provided for you to use to create your own thumbnail.
+An overlay image is provided for you to use to create your own thumbnail.  Replace Preview.png and thumb.png with your own preview images if desired
+
+Edit the About.xml file in Assets/About (in the Unity Project) as needed.  This will be copied to the output directory each time it's exported, and is not updated from the Export Settings
 
 # Upload to Steam Workshop
 
