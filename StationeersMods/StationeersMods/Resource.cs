@@ -122,9 +122,9 @@ namespace StationeersMods
         public IEnumerator LoadCoroutine()
         {
             //only load if mods are enabled
-            ModConfig config = !File.Exists("modconfig.xml")
+            ModConfig config = !File.Exists(WorkshopMenu.ConfigPath)
                 ? new ModConfig()
-                : (PlayerPrefs.GetInt("updated-mod-config", 0) == 1 ? XmlSerialization.Deserialize<ModConfig>("modconfig.xml", "") : ModConfigUpgrader.Upgrade("modconfig.xml"));
+                : XmlSerialization.Deserialize<ModConfig>(WorkshopMenu.ConfigPath, "");
             if (hasNoModConfig(config) || hasModConfigAndIsEnabled(config))
             {
                 yield return _loadState.Load();
@@ -133,18 +133,18 @@ namespace StationeersMods
 
         private bool hasNoModConfig(ModConfig config)
         {
-            return config.Mods.Count == 0 || config.Mods.All(modData => String.IsNullOrEmpty(modData.LocalPath) || String.Compare(
-                Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
+            return config.Mods.Count == 0 || config.Mods.All(modData => String.IsNullOrEmpty(modData.DirectoryPath) || String.Compare(
+                Path.GetFullPath(modData.DirectoryPath).TrimEnd('\\'),
                 Path.GetFullPath(modDirectory).TrimEnd('\\'),
                 StringComparison.InvariantCultureIgnoreCase) != 0);
         }
 
         private bool hasModConfigAndIsEnabled(ModConfig config)
         {
-            return config.Mods.Any(modData => !String.IsNullOrEmpty(modData.LocalPath) && String.Compare(
-                Path.GetFullPath(modData.LocalPath).TrimEnd('\\'),
+            return config.Mods.Any(modData => !String.IsNullOrEmpty(modData.DirectoryPath) && String.Compare(
+                Path.GetFullPath(modData.DirectoryPath).TrimEnd('\\'),
                 Path.GetFullPath(modDirectory).TrimEnd('\\'),
-                StringComparison.InvariantCultureIgnoreCase) == 0 && modData.IsEnabled);
+                StringComparison.InvariantCultureIgnoreCase) == 0 && modData.Enabled);
         }
 
         /// <summary>

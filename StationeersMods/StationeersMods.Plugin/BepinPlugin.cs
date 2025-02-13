@@ -114,11 +114,11 @@ namespace StationeersMods.Plugin
 
         private void SelectMod(WorkshopModListItem modItem)
         {
-            Debug.Log("Mod Path:" + modItem.Data.LocalPath);
+            Debug.Log("Mod Path:" + modItem.Data.DirectoryPath);
             try
             {
                 ConfigFile configFile;
-                ConfigFiles.TryGetValue(modItem.Data.LocalPath, out configFile);
+                ConfigFiles.TryGetValue(modItem.Data.DirectoryPath, out configFile);
                 if (configFile != null)
                 {
                     Debug.Log("Configfile found!");

@@ -33,9 +33,9 @@ namespace StationeersMods.Plugin
         {
             var selectedMod = GetSelectedModData(__instance);
             WorkshopMenu currentInstance = __instance;
-            if (!selectedMod.Data.IsLocal) return;
+            if (selectedMod.Data is not LocalModData) return;
 
-            if (File.Exists(selectedMod.Data.LocalPath + "\\About\\stationeersmods"))
+            if (File.Exists(selectedMod.Data.DirectoryPath + "\\About\\stationeersmods"))
             {
                 Debug.Log("stationeersmods file found.");
                 __instance.SelectedModButtonRight.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -88,7 +88,7 @@ namespace StationeersMods.Plugin
             WorkshopMenuInstance = __instance;
             //if it is a StationeersMods mod
             var selectedMod = GetSelectedModData(__instance);
-            if (File.Exists(selectedMod.Data.LocalPath + "\\About\\stationeersmods"))
+            if (File.Exists(selectedMod.Data.DirectoryPath + "\\About\\stationeersmods"))
             {
                 string descriptionText = XmlSerialization.Deserialize<CustomModAbout>(selectedMod.Data.AboutXmlPath, "ModMetadata").InGameDescription.Value;
                 if (descriptionText != null && !descriptionText.Equals(string.Empty))
@@ -96,18 +96,18 @@ namespace StationeersMods.Plugin
                     __instance.DescriptionText.text = descriptionText;
                 }
             }
-            if (File.Exists(selectedMod.Data.LocalPath + "\\About\\stationeersmods") || File.Exists(selectedMod.Data.LocalPath + "\\About\\bepinex"))
+            if (File.Exists(selectedMod.Data.DirectoryPath + "\\About\\stationeersmods") || File.Exists(selectedMod.Data.DirectoryPath + "\\About\\bepinex"))
             {
-                if(BepinPlugin.ConfigFiles.ContainsKey(selectedMod.Data.LocalPath))
+                if(BepinPlugin.ConfigFiles.ContainsKey(selectedMod.Data.DirectoryPath))
                 {
-                    _configFile = BepinPlugin.ConfigFiles[selectedMod.Data.LocalPath];
+                    _configFile = BepinPlugin.ConfigFiles[selectedMod.Data.DirectoryPath];
                 }else
                 {
                     _configFile = null;
                 }
-                if(BepinPlugin.ModVersionInfos.ContainsKey(selectedMod.Data.LocalPath))
+                if(BepinPlugin.ModVersionInfos.ContainsKey(selectedMod.Data.DirectoryPath))
                 {
-                    _modVersionInfo = BepinPlugin.ModVersionInfos[selectedMod.Data.LocalPath];
+                    _modVersionInfo = BepinPlugin.ModVersionInfos[selectedMod.Data.DirectoryPath];
                 }else
                 {
                     _modVersionInfo = null;
@@ -386,12 +386,12 @@ namespace StationeersMods.Plugin
             }
 
             aboutData.Tags.RemoveAll(tag => tag.ToLower().Equals("stationeersmods") || tag.ToLower().Equals("bepinex"));
-            if (File.Exists(mod.LocalPath + "\\About\\stationeersmods"))
+            if (File.Exists(mod.DirectoryPath + "\\About\\stationeersmods"))
             {
                 aboutData.Tags.Add("StationeersMods");
             }
 
-            if (File.Exists(mod.LocalPath + "\\About\\bepinex"))
+            if (File.Exists(mod.DirectoryPath + "\\About\\bepinex"))
             {
                 aboutData.Tags.Add("StationeersMods");
                 aboutData.Tags.Add("BepInEx");
@@ -399,7 +399,7 @@ namespace StationeersMods.Plugin
 
             SaveXml(aboutData, mod.AboutXmlPath);
 
-            string localPath = mod.LocalPath;
+            string localPath = mod.DirectoryPath;
             string image = localPath + "\\About\\thumb.png";
             if (IsValidModData(aboutData, image))
             {

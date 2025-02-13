@@ -168,20 +168,20 @@ namespace StationeersMods
             try
             {
                 validateModOrder();
-                for (int index = mods.Count - 1; index >= 0; --index)
-                {
-                    ModData modData = mods[index];
-                    if (!modData.IsCore && modData.IsEnabled)
-                    {
-                        typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                            ?.Invoke(null, new object[] {modData.LocalPath + "/GameData"});
-                    }
-                    else if (modData.IsCore)
-                    {
-                        typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                            ?.Invoke(null, new object[] {Application.streamingAssetsPath + "/Data"});
-                    }
-                }
+                // for (int index = mods.Count - 1; index >= 0; --index)
+                // {
+                //     ModData modData = mods[index];
+                //     if (!(modData is CoreModData) && modData.Enabled)
+                //     {
+                //         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                //             ?.Invoke(null, new object[] {modData.LocalPath + "/GameData"});
+                //     }
+                //     else if (modData is CoreModData)
+                //     {
+                //         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
+                //             ?.Invoke(null, new object[] {Application.streamingAssetsPath + "/Data"});
+                //     }
+                // }
             }
             catch (MissingDependencyException ex)
             {
@@ -198,7 +198,7 @@ namespace StationeersMods
                 AlertPanel.Instance.ShowAlert(ex.Message, AlertState.Alert);
             }
 
-            return false;
+            return true;
         }
 
         private static async void SubscribeToMissingMods(List<ModVersion> missing)
@@ -253,7 +253,7 @@ namespace StationeersMods
                     try
                     {
                         if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.LocalPath != item.DirectoryPath)))
-                            WorkshopMenu.ModsConfig.Mods.Add(new ModData(item, true));
+                            WorkshopMenu.ModsConfig.Mods.Add(ModData.CreateFrom(item));
                     }
                     catch (Exception ex)
                     {
@@ -298,7 +298,7 @@ namespace StationeersMods
             for (int index = allMods.Count - 1; index >= 0; --index)
             {
                 ModData modData = allMods[index];
-                if (modData.IsCore)
+                if (modData is CoreModData)
                 {
                     loadedMods.Add(new ModVersion(VersionHelper.GameVersion(), 1UL));
                     continue;
@@ -335,7 +335,7 @@ namespace StationeersMods
                     {
                         if (beforeMod.Id == 1UL)
                         {
-                            return modx.IsCore;
+                            return modx is CoreModData;
                         }
 
                         if (!File.Exists(modx.AboutXmlPath))
@@ -379,7 +379,7 @@ namespace StationeersMods
                             {
                                 if (afterMod.Id == 1UL)
                                 {
-                                    return modx.IsCore;
+                                    return modx is CoreModData;
                                 }
 
                                 if (!File.Exists(modx.AboutXmlPath))
@@ -421,7 +421,7 @@ namespace StationeersMods
 
         private static void SaveModConfig()
         {
-            if (WorkshopMenu.ModsConfig == null || WorkshopMenu.ModsConfig.SaveXml<ModConfig>("modconfig.xml"))
+            if (WorkshopMenu.ModsConfig == null || WorkshopMenu.ModsConfig.SaveXml<ModConfig>(WorkshopMenu.ConfigPath))
                 return;
             Debug.LogError((object) "Error saving modconfig.xml");
         }
@@ -474,7 +474,7 @@ namespace StationeersMods
             Debug.Log("StationeersMods: Start adding local and workshop mods");
 
             if (string.IsNullOrEmpty(Settings.CurrentData.SavePath))
-                Settings.CurrentData.SavePath = StationSaveUtils.DefaultSavePath;
+                Settings.CurrentData.SavePath = StationSaveUtils.DefaultPath;
             var steamTransport = new SteamTransport();
             try
             {
