@@ -1,15 +1,15 @@
 # Creating a unity mod
 
-This guide will help you build your first mod and load it in the game. You can adapt it afterwards to your needs.
+This guide will help you build your first mod and load it in the game. You can adapt it afterwards to your needs. This guide is written for Unity version 2022.3.7f1.
 
 ## Import template
 Download the [ExampleMod](https://github.com/StationeersMods/ExampleMod). This contains a working starter mod you can easily adapt.
 
-- Using Unity 2022.3.7f1, create a 3d Built-In Render Pipeline project for your mod
-- Copy the ExampleMod project into your project folder
+- Run init.bat or init.sh as mentioned in the ExampleMod readme
+- Copy the project into a project folder for Unity (ex. ExampleMod)
 - In Assets/Assemblies there is a copy.txt file. This contains a list of dll's you need to copy over. This can be done with the click of a button inside the Unity Editor.
 - In Assets/StationeersMods is the exporter plugin for Unity. You should update this with the latest version of StationeersMods-exporter.zip from [Github](https://github.com/jixxed/StationeersMods/releases).
-- Open the folder in the Unity Hub and open the project.
+- Add the folder to Unity Hub as a project and open it.
 
 If the project fails to compile you will get an error:
 
