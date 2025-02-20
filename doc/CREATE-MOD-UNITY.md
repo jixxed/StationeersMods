@@ -18,7 +18,7 @@ If the project fails to compile you will get an error:
 You can click Ignore and try to fix the issues. This will usually be related to changes in the assemblies.
 
 ## Copy assemblies
-To copy the assemblies you can click the button in the editor, under StationeersMods -> Export Settings. Make sure you have the Stationeers game folder set in the exporter settings.
+To copy the assemblies you can click the button in the editor, under StationeersMods -> Export Settings (on the Development tab). Make sure you have the Stationeers game folder set in the exporter settings.
 This action will copy over all the assemblies defined in the copy.txt file. Be aware that the game might add new assemblies in the future, so you might need to update this list.
 
 ![img.png](copy_assemblies.png)
@@ -103,9 +103,11 @@ This should be done automatically if you used init.bat or init.sh as mentioned i
 
 there is a `stationeersmods` file in the `About` folder. This file is mandatory for StationeersMods mods as a way to recognize the mod needs to be processed as a StationeersMods mod.
 
-An overlay image is provided for you to use to create your own thumbnail.  Replace Preview.png and thumb.png with your own preview images if desired
+An overlay image is provided for you to use to create your own thumbnail.  Replace `Preview.png` and `thumb.png` with your own preview images if desired
 
-Edit the About.xml file in Assets/About (in the Unity Project) as needed.  This will be copied to the output directory each time it's exported, and is not updated from the Export Settings
+Edit the `About.xml` file in `Assets/About` (in the Unity Project) as needed.  This will be copied to the output directory each time it's exported, and is not updated from the Export Settings
+
+Follow the instructions provided in the `readme` in the `About` folder once finished
 
 # Upload to Steam Workshop
 
