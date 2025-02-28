@@ -5,131 +5,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StationeersMods</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
     <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #A2C2E9; /* Soft pastel gradient fallback */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            position: relative; /* Positioning for background effect */
+            overflow-x: hidden;
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #1c1c1c; /* Dark background */
-    color: #f0f0f0; /* Light text color */
-    margin: 0;
-    padding: 20px;
-    background-image: url('https://rocketwerkz.com/wp-content/uploads/stationeers-bg-02-scaled.jpg'); /* Background image */
-    background-size: cover; /* Cover the entire background */
-    background-position: center; /* Center the background image */
-}
+        /* Parallax Background Image */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://rocketwerkz.com/wp-content/uploads/stationeers-bg-02-scaled.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Place it behind all content */
+            will-change: transform; /* Optimize performance during scroll */
+        }
 
-.container {
-    max-width: 800px; /* Maximum width for the content */
-    margin: 0 auto; /* Center the container */
-    padding: 20px; /* Padding around the content */
-    background-color: rgba(28, 28, 28, 0.8); /* Slightly transparent background for readability */
-    border-radius: 10px; /* Rounded corners */
-}
-        h1,
-        h2,
+        /* Container for content */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 50px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.85); /* Light white background with opacity */
+            border-radius: 10px; /* Sharper edges */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); /* Soft shadow for 3D effect */
+            backdrop-filter: blur(10px); /* Subtle blur to make it pop from background */
+            overflow: hidden;
+        }
+
+        /* Header Styling */
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800; /* Bold headlines */
+            color: #4A90E2; /* Soft blue accent */
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
         h3 {
-            color: #ffcc00;
-            /* Yellow color for headings */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #E67E22; /* Coral for subheadings */
+            text-transform: uppercase;
         }
 
-        a {
-            color: #00ccff;
-            /* Light blue for links */
-            text-decoration: none;
+        /* Instructions section styles */
+        .instructions {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px; /* Sharper edges */
+            margin-bottom: 40px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(8px);
         }
 
-        a:hover {
-            text-decoration: underline;
-            /* Underline on hover */
+        .instructions h2 {
+            font-size: 24px;
+            color: #E67E22;
+            border-bottom: 4px solid #4A90E2;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+        }
+
+        /* Paragraph & General Text */
+        p {
+            line-height: 1.7;
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #555;
         }
 
         ol {
             margin-left: 20px;
+            padding-left: 10px;
+            list-style-type: decimal;
         }
 
-        code {
-            background-color: #333;
-            /* Dark background for code */
-            color: #ffcc00;
-            /* Yellow text for code */
-            padding: 2px 4px;
-            border-radius: 3px;
+        /* Links */
+        a {
+            color: #4A90E2;
+            text-decoration: none;
+            transition: color 0.3s ease;
         }
 
-        p {
-            line-height: 1.5;
-            /* Improve readability */
+        a:hover {
+            color: #E67E22; /* Accent on hover */
+            text-decoration: underline;
         }
 
+        /* Button Styling */
         .download-button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #00ccff;
-            /* Button background color */
-            color: #ffffff;
-            /* Button text color */
-            border: none;
-            border-radius: 5px;
+            padding: 12px 30px;
+            background-color: #4A90E2;
+            color: #fff;
+            border-radius: 50px;
             font-size: 16px;
             text-align: center;
             text-decoration: none;
-            transition: background-color 0.3s, transform 0.3s;
-            /* Smooth transition */
+            transition: all 0.3s ease;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
 
         .download-button:hover {
-            background-color: #0099cc;
-            /* Darker shade on hover */
-            transform: scale(1.05);
-            /* Slightly enlarge on hover */
+            background-color: #357ABD;
+            transform: translateY(-4px); /* 3D hover effect */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
+        .download-button:active {
+            transform: translateY(2px); /* 3D pressed effect */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Release Container Styling */
         .release-container {
             display: flex;
             justify-content: space-between;
-            /* Space between the two columns */
-            margin-top: 20px;
-            /* Space above the release section */
+            gap: 30px;
+            margin-top: 40px;
         }
 
+        /* Release Panel with Inset, Angular and Sci-fi Feel */
         .release {
             flex: 1;
-            /* Allow each release section to take equal space */
-            margin-right: 20px;
-            /* Space between the two sections */
+            background: #212121; /* Sleek metallic background */
+            padding: 30px;
+            border-radius: 10px; /* Sharper edges */
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            position: relative; /* For the bolt hole effect */
+            color: #fff;
+            overflow: hidden; /* Prevent overflow from the diagonal lines */
         }
-        .release h3 {
-    text-align: center; /* Center the headings */
-    margin-bottom: 10px; /* Space below the headings */
-}
-        .release:last-child {
-            margin-right: 0;
-            /* Remove margin from the last section */
-        }
-        
-        .version-text {
-    text-align: center; /* Center the version text */
-    margin-bottom: 10px; /* Space below the version text */
-}
 
-.button-container {
-    text-align: center; /* Center the buttons */
-    margin-top: 10px; /* Space above the buttons */
-}
+        /* Panel Shape with Diagonal Angles */
+        .release:nth-child(1) {
+            clip-path: polygon(0% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 0% 100%, 0% 20%);
+        }
+
+        .release:nth-child(2) {
+            clip-path: polygon(0% 0%, 90% 0%, 100% 20%, 100% 80%, 90% 100%, 0% 100%, 0% 20%);
+        }
+
+        /* Bolt hole effect for releases */
+        .release .bolt-hole {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #888;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        .release .bolt-hole.one {
+            top: 15px;
+            left: 15px;
+        }
+
+        .release .bolt-hole.two {
+            top: 15px;
+            right: 15px;
+        }
+
+        .release .bolt-hole.three {
+            bottom: 15px;
+            left: 15px;
+        }
+
+        .release .bolt-hole.four {
+            bottom: 15px;
+            right: 15px;
+        }
+
+        .release h3 {
+            margin-bottom: 15px;
+            font-size: 24px; /* Bigger font size for bolder feel */
+            color: #E67E22;
+            z-index: 3; /* Make sure the text is on top */
+            position: relative;
+        }
+
+        .version-text {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* 3D Page Animation */
+        body {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
+
 <body>
+    <!-- Parallax Background -->
+    <div class="background-image"></div>
+
     <div class="container">
         <h1>Welcome to StationeersMods</h1>
-        <h2>Installation Instructions</h2>
-        <p>StationeersMods is a Bepinex plugin, so it is installed just like any other. StationeersMods will load mods you subscribed to from the workshop.</p>
-        <ol>
-            <li>If you haven't installed Bepinex (5.4.23.2 is the latest supported at time of writing. 6.0 is not yet supported) for the game: <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="_blank">Install BepInEx</a> (<strong>Follow the instructions!</strong>)</li>
-            <li>Download the latest <code>StationeersMods.zip</code> from <a href="https://github.com/jixxed/StationeersMods/releases" target="_blank">Releases</a> and extract the zip to your <code>BepInEx/plugins/</code> folder. You should end up with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code> files in it.</li>
-            <li>Install your mods from the workshop and play the game.</li>
-        </ol>
-        <p>If you have questions, you can ask them on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
 
+        <!-- Instructions Section -->
+        <div class="instructions">
+            <h2>Installation Instructions</h2>
+            <p>StationeersMods is a Bepinex plugin that helps you load mods you subscribed to from the workshop. Follow the instructions below to get started.</p>
+            <ol>
+                <li>If you haven't installed Bepinex yet, <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="_blank">click here</a> to install it.</li>
+                <li>Download the latest <code>StationeersMods.zip</code> from <a href="https://github.com/jixxed/StationeersMods/releases" target="_blank">Releases</a> and extract it to the <code>BepInEx/plugins/</code> folder.</li>
+                <li>Install mods from the workshop and enjoy your game!</li>
+            </ol>
+            <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
+        </div>
+
+        <!-- Release Versions Section -->
         <h2>Latest Releases</h2>
         <div class="release-container">
             <div class="release">
@@ -141,7 +255,7 @@ body {
                     <a id="stable-link" class="download-button" href="#">Download Stable Release</a>
                 </div>
             </div>
-        
+
             <div class="release">
                 <h3>Beta Version</h3>
                 <p class="version-text">
@@ -153,28 +267,30 @@ body {
             </div>
         </div>
     </div>
+
     <script>
+        // Fetch releases
         async function fetchReleases() {
-    const response = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
-    const releases = await response.json();
+            const response = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
+            const releases = await response.json();
 
-    const stableRelease = releases.find(release => !release.prerelease);
-    const betaRelease = releases.find(release => release.prerelease);
+            const stableRelease = releases.find(release => !release.prerelease);
+            const betaRelease = releases.find(release => release.prerelease);
 
-    document.getElementById('stable-version').textContent = stableRelease ? stableRelease.tag_name : 'N/A';
-    document.getElementById('beta-version').textContent = betaRelease ? betaRelease.tag_name : 'N/A';
+            document.getElementById('stable-version').textContent = stableRelease ? stableRelease.tag_name : 'N/A';
+            document.getElementById('beta-version').textContent = betaRelease ? betaRelease.tag_name : 'N/A';
 
-    function getDownloadUrl(release) {
-        if (!release || !release.assets) return '#'; 
-        const zipAsset = release.assets.find(asset => asset.name === 'StationeersMods.zip'); // Ensures correct file
-        return zipAsset ? zipAsset.browser_download_url : '#';
-    }
+            function getDownloadUrl(release) {
+                if (!release || !release.assets) return '#';
+                const zipAsset = release.assets.find(asset => asset.name.toLowerCase().includes('stationeersmods.zip'));
+                return zipAsset ? zipAsset.browser_download_url : '#';
+            }
 
-    document.getElementById('stable-link').href = getDownloadUrl(stableRelease);
-    document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
-}
+            document.getElementById('stable-link').href = getDownloadUrl(stableRelease);
+            document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
+        }
 
-fetchReleases();
+        fetchReleases();
     </script>
 </body>
 
