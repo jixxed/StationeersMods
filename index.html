@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StationeersMods</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     
     <style>
@@ -13,7 +14,7 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #4a90e2, #6b8fe9); /* Smooth gradient background */
+            background: linear-gradient(135deg, #4a90e2, #6b8fe9); 
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -44,7 +45,7 @@
             padding: 40px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); /* Stronger shadow for depth */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
@@ -135,17 +136,34 @@
             transition: all 0.3s ease;
             margin: 20px 0;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #4A90E2 25%, #357ABD 75%);
+            background-size: 200% 200%;
         }
 
         .download-button:hover {
-            background-color: #357ABD;
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            background-position: 100% 0;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 10px rgba(70, 160, 255, 1), 0 10px 15px rgba(70, 160, 255, 0.4);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            border: 1px solid #5bc0de;
+            background: linear-gradient(45deg, #5bc0de 25%, #4A90E2 75%);
         }
 
         .download-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(8px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
+        }
+
+        .download-button .fa-download {
+            font-size: 20px;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .download-button:hover .fa-download {
+            transform: rotate(360deg);
         }
 
         .release-container {
@@ -198,12 +216,23 @@
             0% { opacity: 0; transform: translateY(30px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+        /* Glow Effect Only on Hover (Bottom Glow) */
+        .download-button {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Standard shadow */
+        }
+
+        .download-button:hover {
+            box-shadow: 0 6px 10px rgba(70, 160, 255, 1), 0 12px 30px rgba(70, 160, 255, 0.6); /* Brighter, bottom-focused glow */
+        }
     </style>
 </head>
 
 <body>
+    <!-- Google Translate Widget -->
     <div id="google_translate_element"></div>
 
+    <!-- Parallax Background -->
     <div class="background-image"></div>
 
     <div class="container">
@@ -221,6 +250,7 @@
             <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
         </div>
 
+        <!-- Release Versions Section -->
         <h2>Latest Releases</h2>
         <div class="release-container">
             <div class="release">
@@ -246,6 +276,7 @@
     </div>
 
     <script>
+        // Initialize Google Translate
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
@@ -254,6 +285,7 @@
             }, 'google_translate_element');
         }
 
+        // Fetch releases
         async function fetchReleases() {
             const response = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
             const releases = await response.json();
@@ -276,6 +308,7 @@
 
         fetchReleases();
 
+        // Parallax effect: move background based on scroll
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
             const parallaxSpeed = 0.5;
