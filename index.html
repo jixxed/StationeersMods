@@ -165,8 +165,8 @@ body {
     document.getElementById('beta-version').textContent = betaRelease ? betaRelease.tag_name : 'N/A';
 
     function getDownloadUrl(release) {
-        if (!release || !release.assets || release.assets.length === 0) return '#'; 
-        const zipAsset = release.assets.find(asset => asset.name.includes('.zip')); 
+        if (!release || !release.assets) return '#'; 
+        const zipAsset = release.assets.find(asset => asset.name === 'StationeersMods.zip'); // Ensures correct file
         return zipAsset ? zipAsset.browser_download_url : '#';
     }
 
