@@ -5,19 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StationeersMods</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap"
+        rel="stylesheet">
 
     <!-- Font Awesome CDN link for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    
+
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #4a90e2, #6b8fe9); 
+            background: linear-gradient(135deg, #4a90e2, #6b8fe9);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -29,7 +30,8 @@
         }
 
         .background-image {
-            position: absolute; /* Changed to absolute for proper scrolling */
+            position: absolute;
+            /* Changed to absolute for proper scrolling */
             top: 0;
             left: 0;
             width: 100%;
@@ -39,9 +41,11 @@
             background-position: center;
             z-index: -1;
             filter: brightness(50%);
-            transform: translateZ(0); /* Ensures proper rendering */
+            transform: translateZ(0);
+            /* Ensures proper rendering */
             will-change: transform;
-            background-attachment: scroll; /* Scroll effect for background */
+            background-attachment: scroll;
+            /* Scroll effect for background */
             transition: transform 0.2s ease-out;
         }
 
@@ -51,7 +55,7 @@
             padding: 40px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
@@ -155,12 +159,13 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
             border: 1px solid #5bc0de;
             background: linear-gradient(45deg, #5bc0de 25%, #4A90E2 75%);
-            color: white; /* Ensures text stays white on hover */
+            color: white;
+            /* Ensures text stays white on hover */
         }
 
         .download-button:active {
             transform: translateY(8px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .download-button .fa-download {
@@ -202,6 +207,7 @@
                 transform: translateY(50px);
                 opacity: 0;
             }
+
             100% {
                 transform: translateY(0);
                 opacity: 1;
@@ -236,17 +242,26 @@
         }
 
         @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Glow Effect Only on Hover (Bottom Glow) */
         .download-button {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Standard shadow */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            /* Standard shadow */
         }
 
         .download-button:hover {
-            box-shadow: 0 6px 10px rgba(70, 160, 255, 1), 0 12px 30px rgba(70, 160, 255, 0.6); /* Brighter, bottom-focused glow */
+            box-shadow: 0 6px 10px rgba(70, 160, 255, 1), 0 12px 30px rgba(70, 160, 255, 0.6);
+            /* Brighter, bottom-focused glow */
         }
 
         /* Floating Action Button for Discord */
@@ -257,13 +272,17 @@
             background-color: #7289da;
             color: white;
             padding: 16px;
-            border-radius: 12px;  /* Rounded corners */
-            font-size: 32px;  /* Increased icon size */
+            border-radius: 12px;
+            /* Rounded corners */
+            font-size: 32px;
+            /* Increased icon size */
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             z-index: 100;
-            width: 60px; /* Keep the button square */
-            height: 60px; /* Keep the button square */
+            width: 60px;
+            /* Keep the button square */
+            height: 60px;
+            /* Keep the button square */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -288,15 +307,24 @@
         <h1>Welcome to StationeersMods</h1>
 
         <!-- Instructions Section with Dark Theme -->
-        <div class="instructions">
-            <h2>Installation Instructions</h2>
-            <p>StationeersMods is a Bepinex plugin that helps you load mods you subscribed to from the workshop. Follow the instructions below to get started.</p>
-            <ol>
-                <li>If you haven't installed Bepinex yet, <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="_blank">click here</a> to install it.</li>
-                <li>Download the latest <code>StationeersMods.zip</code> from <a href="https://github.com/jixxed/StationeersMods/releases" target="_blank">Releases</a> and extract it to the <code>BepInEx/plugins/</code> folder.</li>
-                <li>Install mods from the workshop and enjoy your game!</li>
-            </ol>
-            <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
+        <div class="release-container">
+            <div class="instructions">
+                <h2>Installation Instructions</h2>
+                <p>StationeersMods is a Bepinex plugin that helps you load mods you subscribed to from the workshop.
+                    Follow the instructions below to get started.</p>
+                <ol>
+                    <li>If you haven't installed Bepinex yet, <a
+                            href="https://docs.bepinex.dev/articles/user_guide/installation/index.html"
+                            target="_blank">click here</a> to install it. (<strong>Follow the instructions! You can skip
+                            step 4</strong>)</li>
+                    <li>Download the latest version of StationeersMods below and extract it to the
+                        <code>BepInEx/plugins/</code> folder, which was created in the previous step. You should end up
+                        with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code>
+                        files in it.</li>
+                    <li>Install mods from the workshop and enjoy your game!</li>
+                </ol>
+                <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
+            </div>
         </div>
 
         <!-- Release Versions Section -->
@@ -307,6 +335,9 @@
                 <p class="version-text">
                     <strong>Version:</strong> <span id="stable-version">Loading...</span>
                 </p>
+                <p class="explain-text">
+                    This version is recommended for most users and will automatically update itself.
+                </p>
                 <div class="button-container">
                     <a id="stable-link" class="download-button" href="#">Download Stable Release</a>
                 </div>
@@ -316,6 +347,11 @@
                 <h3>Beta Version</h3>
                 <p class="version-text">
                     <strong>Version:</strong> <span id="beta-version">Loading...</span>
+                </p>
+                <p class="explain-text">
+                    This version is intended to be compatible with the beta branch of Stationeers. It is not guaranteed
+                    to work. You will need to install it manually whenever there is a beta. This button will download
+                    the latest beta version or stable version, whichever is newest.
                 </p>
                 <div class="button-container">
                     <a id="beta-link" class="download-button" href="#">Download Beta Release</a>
@@ -347,8 +383,26 @@
             const stableRelease = releases.find(release => !release.prerelease);
             const betaRelease = releases.find(release => release.prerelease);
 
-            document.getElementById('stable-version').textContent = stableRelease ? stableRelease.tag_name : 'N/A';
-            document.getElementById('beta-version').textContent = betaRelease ? betaRelease.tag_name : 'N/A';
+            const stableVersion = stableRelease ? stableRelease.tag_name : 'N/A';
+            const betaVersion = betaRelease ? betaRelease.tag_name : 'N/A';
+
+            document.getElementById('stable-version').textContent = stableVersion;
+
+            // Function to compare version numbers
+            function compareVersions(v1, v2) {
+                const v1Parts = v1.replace('v', '').split('.').map(Number);
+                const v2Parts = v2.replace('v', '').split('.').map(Number);
+
+                for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+                    const v1Part = v1Parts[i] || 0; // Default to 0 if part is missing
+                    const v2Part = v2Parts[i] || 0; // Default to 0 if part is missing
+
+                    if (v1Part > v2Part) return 1;
+                    if (v1Part < v2Part) return -1;
+                }
+                return 0; // Versions are equal
+            }
+
 
             function getDownloadUrl(release) {
                 if (!release || !release.assets) return '#';
@@ -356,8 +410,20 @@
                 return zipAsset ? zipAsset.browser_download_url : '#';
             }
 
+            // Compare the stable and beta versions
+            const versionComparison = compareVersions(stableVersion, betaVersion);
+
+            // Set the stable link to the zip asset
             document.getElementById('stable-link').href = getDownloadUrl(stableRelease);
-            document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
+
+            // Provide the stable link if the stable version is higher
+            if (versionComparison > 0) {
+                document.getElementById('beta-link').href = document.getElementById('stable-link').href;
+            } else {
+                document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
+            }
+
+            document.getElementById('beta-version').textContent = betaVersion;
         }
 
         fetchReleases();
