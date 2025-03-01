@@ -5,131 +5,301 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StationeersMods</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome CDN link for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
     <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #4a90e2, #6b8fe9); 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #1c1c1c; /* Dark background */
-    color: #f0f0f0; /* Light text color */
-    margin: 0;
-    padding: 20px;
-    background-image: url('https://rocketwerkz.com/wp-content/uploads/stationeers-bg-02-scaled.jpg'); /* Background image */
-    background-size: cover; /* Cover the entire background */
-    background-position: center; /* Center the background image */
-}
+        .background-image {
+            position: absolute; /* Changed to absolute for proper scrolling */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://rocketwerkz.com/wp-content/uploads/stationeers-bg-02-scaled.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: brightness(50%);
+            transform: translateZ(0); /* Ensures proper rendering */
+            will-change: transform;
+            background-attachment: scroll; /* Scroll effect for background */
+            transition: transform 0.2s ease-out;
+        }
 
-.container {
-    max-width: 800px; /* Maximum width for the content */
-    margin: 0 auto; /* Center the container */
-    padding: 20px; /* Padding around the content */
-    background-color: rgba(28, 28, 28, 0.8); /* Slightly transparent background for readability */
-    border-radius: 10px; /* Rounded corners */
-}
-        h1,
-        h2,
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 4rem;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
         h3 {
-            color: #ffcc00;
-            /* Yellow color for headings */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: #e67e22;
         }
 
-        a {
-            color: #00ccff;
-            /* Light blue for links */
-            text-decoration: none;
+        .instructions {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 50px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            width: 100%;
+            text-align: left;
         }
 
-        a:hover {
-            text-decoration: underline;
-            /* Underline on hover */
+        .instructions h2 {
+            font-size: 26px;
+            color: #e67e22;
+            border-bottom: 4px solid #4A90E2;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #ddd;
+            margin-bottom: 25px;
+            line-height: 1.7;
         }
 
         ol {
             margin-left: 20px;
+            padding-left: 10px;
+            list-style-type: decimal;
+            color: #ddd;
         }
 
-        code {
-            background-color: #333;
-            /* Dark background for code */
-            color: #ffcc00;
-            /* Yellow text for code */
-            padding: 2px 4px;
-            border-radius: 3px;
+        a {
+            color: #4A90E2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
 
-        p {
-            line-height: 1.5;
-            /* Improve readability */
+        a:hover {
+            color: #e67e22;
+            text-decoration: underline;
         }
 
         .download-button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #00ccff;
-            /* Button background color */
-            color: #ffffff;
-            /* Button text color */
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 14px 32px;
+            background-color: #4A90E2;
+            color: #fff;
+            border-radius: 30px;
+            font-size: 18px;
             text-align: center;
             text-decoration: none;
-            transition: background-color 0.3s, transform 0.3s;
-            /* Smooth transition */
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #4A90E2 25%, #357ABD 75%);
+            background-size: 200% 200%;
         }
 
         .download-button:hover {
-            background-color: #0099cc;
-            /* Darker shade on hover */
-            transform: scale(1.05);
-            /* Slightly enlarge on hover */
+            background-position: 100% 0;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 10px rgba(70, 160, 255, 1), 0 10px 15px rgba(70, 160, 255, 0.4);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            border: 1px solid #5bc0de;
+            background: linear-gradient(45deg, #5bc0de 25%, #4A90E2 75%);
+            color: white; /* Ensures text stays white on hover */
         }
 
+        .download-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
+        }
+
+        .download-button .fa-download {
+            font-size: 20px;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .download-button:hover .fa-download {
+            transform: rotate(360deg);
+        }
+
+        /* Flexbox to display cards side by side */
         .release-container {
             display: flex;
             justify-content: space-between;
-            /* Space between the two columns */
-            margin-top: 20px;
-            /* Space above the release section */
+            gap: 40px;
+            width: 100%;
+            margin-top: 50px;
         }
 
         .release {
-            flex: 1;
-            /* Allow each release section to take equal space */
-            margin-right: 20px;
-            /* Space between the two sections */
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+            width: 48%;
+            backdrop-filter: blur(8px);
+            transform: translateY(50px);
+            opacity: 0;
+            animation: slideInUp 1s ease forwards;
         }
-        .release h3 {
-    text-align: center; /* Center the headings */
-    margin-bottom: 10px; /* Space below the headings */
-}
-        .release:last-child {
-            margin-right: 0;
-            /* Remove margin from the last section */
-        }
-        
-        .version-text {
-    text-align: center; /* Center the version text */
-    margin-bottom: 10px; /* Space below the version text */
-}
 
-.button-container {
-    text-align: center; /* Center the buttons */
-    margin-top: 10px; /* Space above the buttons */
-}
+        /* Slide in animation for the cards */
+        @keyframes slideInUp {
+            0% {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .release h3 {
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: #e67e22;
+        }
+
+        .version-text {
+            font-size: 16px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        #google_translate_element {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50px;
+            padding: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glow Effect Only on Hover (Bottom Glow) */
+        .download-button {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Standard shadow */
+        }
+
+        .download-button:hover {
+            box-shadow: 0 6px 10px rgba(70, 160, 255, 1), 0 12px 30px rgba(70, 160, 255, 0.6); /* Brighter, bottom-focused glow */
+        }
+
+        /* Floating Action Button for Discord */
+        .fab-discord {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #7289da;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;  /* Rounded corners */
+            font-size: 32px;  /* Increased icon size */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            width: 60px; /* Keep the button square */
+            height: 60px; /* Keep the button square */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fab-discord:hover {
+            background-color: #5b6e9c;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+        }
     </style>
 </head>
+
 <body>
+    <!-- Google Translate Widget -->
+    <div id="google_translate_element"></div>
+
+    <!-- Parallax Background -->
+    <div class="background-image"></div>
+
     <div class="container">
         <h1>Welcome to StationeersMods</h1>
-        <h2>Installation Instructions</h2>
-        <p>StationeersMods is a Bepinex plugin, so it is installed just like any other. StationeersMods will load mods you subscribed to from the workshop.</p>
-        <ol>
-            <li>If you haven't installed Bepinex (5.4.23.2 is the latest supported at time of writing. 6.0 is not yet supported) for the game: <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="_blank">Install BepInEx</a> (<strong>Follow the instructions!</strong>)</li>
-            <li>Download the latest <code>StationeersMods.zip</code> from <a href="https://github.com/jixxed/StationeersMods/releases" target="_blank">Releases</a> and extract the zip to your <code>BepInEx/plugins/</code> folder. You should end up with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code> files in it.</li>
-            <li>Install your mods from the workshop and play the game.</li>
-        </ol>
-        <p>If you have questions, you can ask them on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
 
+        <!-- Instructions Section with Dark Theme -->
+        <div class="instructions">
+            <h2>Installation Instructions</h2>
+            <p>StationeersMods is a Bepinex plugin that helps you load mods you subscribed to from the workshop. Follow the instructions below to get started.</p>
+            <ol>
+                <li>If you haven't installed Bepinex yet, <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="_blank">click here</a> to install it.</li>
+                <li>Download the latest <code>StationeersMods.zip</code> from <a href="https://github.com/jixxed/StationeersMods/releases" target="_blank">Releases</a> and extract it to the <code>BepInEx/plugins/</code> folder.</li>
+                <li>Install mods from the workshop and enjoy your game!</li>
+            </ol>
+            <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
+        </div>
+
+        <!-- Release Versions Section -->
         <h2>Latest Releases</h2>
         <div class="release-container">
             <div class="release">
@@ -141,7 +311,7 @@ body {
                     <a id="stable-link" class="download-button" href="#">Download Stable Release</a>
                 </div>
             </div>
-        
+
             <div class="release">
                 <h3>Beta Version</h3>
                 <p class="version-text">
@@ -153,7 +323,23 @@ body {
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button for Discord -->
+    <a href="https://discord.gg/AEmQR3XCGm" class="fab-discord" target="_blank">
+        <i class="fab fa-discord"></i>
+    </a>
+
     <script>
+        // Initialize Google Translate
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,es,de,fr,it,pt,ru,zh-CN',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+
+        // Fetch releases
         async function fetchReleases() {
             const response = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
             const releases = await response.json();
@@ -161,43 +347,39 @@ body {
             const stableRelease = releases.find(release => !release.prerelease);
             const betaRelease = releases.find(release => release.prerelease);
 
-            const stableVersion = stableRelease ? stableRelease.tag_name : 'N/A';
-            const betaVersion = betaRelease ? betaRelease.tag_name : 'N/A';
+            document.getElementById('stable-version').textContent = stableRelease ? stableRelease.tag_name : 'N/A';
+            document.getElementById('beta-version').textContent = betaRelease ? betaRelease.tag_name : 'N/A';
 
-            document.getElementById('stable-version').textContent = stableVersion;
-
-            // Function to compare version numbers
-            function compareVersions(v1, v2) {
-                const v1Parts = v1.replace('v', '').split('.').map(Number);
-                const v2Parts = v2.replace('v', '').split('.').map(Number);
-
-                for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
-                    const v1Part = v1Parts[i] || 0; // Default to 0 if part is missing
-                    const v2Part = v2Parts[i] || 0; // Default to 0 if part is missing
-
-                    if (v1Part > v2Part) return 1;
-                    if (v1Part < v2Part) return -1;
-                }
-                return 0; // Versions are equal
+            function getDownloadUrl(release) {
+                if (!release || !release.assets) return '#';
+                const zipAsset = release.assets.find(asset => asset.name.toLowerCase().includes('stationeersmods.zip'));
+                return zipAsset ? zipAsset.browser_download_url : '#';
             }
 
-            // Compare the stable and beta versions
-            const versionComparison = compareVersions(stableVersion, betaVersion);
-
-            // Set the stable link to the zip asset
-            document.getElementById('stable-link').href = stableRelease ? stableRelease.assets.find(asset => asset.name === 'StationeersMods.zip').url : '#';
-
-            // Provide the stable link if the stable version is higher
-            if (versionComparison > 0) {
-                document.getElementById('beta-link').href = document.getElementById('stable-link').href;
-            } else {
-                document.getElementById('beta-link').href = betaRelease ? betaRelease.assets.find(asset => asset.name === 'StationeersMods.zip').url : '#';
-            }
-
-            document.getElementById('beta-version').textContent = betaVersion;
+            document.getElementById('stable-link').href = getDownloadUrl(stableRelease);
+            document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
         }
 
         fetchReleases();
+
+        // Smoother parallax scrolling with requestAnimationFrame
+        let lastScrollY = 0;
+        let ticking = false;
+
+        function updateParallax() {
+            const scrollY = window.scrollY;
+            const parallaxSpeed = 0.5;
+            const bg = document.querySelector('.background-image');
+            bg.style.transform = `translateY(${scrollY * parallaxSpeed}px)`;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
     </script>
 </body>
 
