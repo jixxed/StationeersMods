@@ -29,7 +29,7 @@
         }
 
         .background-image {
-            position: absolute;
+            position: absolute; /* Changed to absolute for proper scrolling */
             top: 0;
             left: 0;
             width: 100%;
@@ -38,8 +38,11 @@
             background-size: cover;
             background-position: center;
             z-index: -1;
-            will-change: transform;
             filter: brightness(50%);
+            transform: translateZ(0); /* Ensures proper rendering */
+            will-change: transform;
+            background-attachment: scroll; /* Scroll effect for background */
+            transition: transform 0.2s ease-out;
         }
 
         .container {
@@ -146,19 +149,19 @@
         }
 
         .download-button:hover {
-    background-position: 100% 0;
-    transform: translateY(-8px);
-    box-shadow: 0 10px 10px rgba(70, 160, 255, 1), 0 10px 15px rgba(70, 160, 255, 0.4);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-    border: 1px solid #5bc0de;
-    background: linear-gradient(45deg, #5bc0de 25%, #4A90E2 75%);
-    color: white; /* Ensures text stays white on hover */
-}
+            background-position: 100% 0;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 10px rgba(70, 160, 255, 1), 0 10px 15px rgba(70, 160, 255, 0.4);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            border: 1px solid #5bc0de;
+            background: linear-gradient(45deg, #5bc0de 25%, #4A90E2 75%);
+            color: white; /* Ensures text stays white on hover */
+        }
 
-.download-button:active {
-    transform: translateY(8px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
-}
+        .download-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
+        }
 
         .download-button .fa-download {
             font-size: 20px;
@@ -248,29 +251,29 @@
 
         /* Floating Action Button for Discord */
         .fab-discord {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #7289da;
-    color: white;
-    padding: 16px;
-    border-radius: 12px;  /* Rounded corners */
-    font-size: 32px;  /* Increased icon size */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    z-index: 100;
-    width: 60px; /* Keep the button square */
-    height: 60px; /* Keep the button square */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #7289da;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;  /* Rounded corners */
+            font-size: 32px;  /* Increased icon size */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            width: 60px; /* Keep the button square */
+            height: 60px; /* Keep the button square */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.fab-discord:hover {
-    background-color: #5b6e9c;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    transform: translateY(-5px);
-}
+        .fab-discord:hover {
+            background-color: #5b6e9c;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 
@@ -359,12 +362,23 @@
 
         fetchReleases();
 
-        // Parallax effect: move background based on scroll
-        window.addEventListener('scroll', () => {
+        // Smoother parallax scrolling with requestAnimationFrame
+        let lastScrollY = 0;
+        let ticking = false;
+
+        function updateParallax() {
             const scrollY = window.scrollY;
             const parallaxSpeed = 0.5;
             const bg = document.querySelector('.background-image');
             bg.style.transform = `translateY(${scrollY * parallaxSpeed}px)`;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
         });
     </script>
 </body>
