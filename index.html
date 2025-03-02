@@ -88,6 +88,10 @@
             color: #e67e22;
         }
 
+        code {
+            color: #e67e22;
+        }
+
         .instructions {
             background: rgba(0, 0, 0, 0.8);
             padding: 40px;
@@ -312,17 +316,12 @@
                 <h2>Installation Instructions</h2>
                 <p>StationeersMods is a Bepinex plugin that helps you load mods you subscribed to from the workshop.
                     Follow the instructions below to get started.</p>
-                <ol>
-                    <li>If you haven't installed Bepinex yet, <a
-                            href="https://docs.bepinex.dev/articles/user_guide/installation/index.html"
-                            target="_blank">click here</a> to install it. (<strong>Follow the instructions! You can skip
-                            step 4</strong>)</li>
-                    <li>Download the latest version of StationeersMods below and extract it to the
-                        <code>BepInEx/plugins/</code> folder, which was created in the previous step. You should end up
-                        with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code>
-                        files in it.</li>
-                    <li>Install mods from the workshop and enjoy your game!</li>
+                <ol id="installation-steps">
+                    <!-- Installation steps will be inserted here by JavaScript -->
                 </ol>
+                <div class="button-container">
+                    <a id="bepinex-link" class="download-button" href="#">Download BepInEx</a>
+                </div>
                 <p>For help, join us on <a href="https://discord.gg/AEmQR3XCGm" target="_blank">Discord</a>.</p>
             </div>
         </div>
@@ -426,7 +425,69 @@
             document.getElementById('beta-version').textContent = betaVersion;
         }
 
+        async function fetchBepInExRelease() {
+            const response = await fetch('https://api.github.com/repos/BepInEx/BepInEx/releases/latest');
+            const release = await response.json();
+
+            function getBepInExDownloadUrl(release) {
+                if (!release || !release.assets) return '#';
+                let assetName;
+                const platform = navigator.platform.toLowerCase();
+
+                if (platform.includes('win')) {
+                    assetName = 'BepInEx_win_x64';
+                } else if (platform.includes('mac')) {
+                    assetName = 'BepInEx_macos_x64';
+                } else if (platform.includes('linux')) {
+                    assetName = 'BepInEx_linux_x64';
+                } else {
+                    return '#'; // Default to a placeholder if platform is not recognized
+                }
+
+                const asset = release.assets.find(asset => asset.name.includes(assetName));
+                return asset ? asset.browser_download_url : '#';
+            }
+
+            document.getElementById('bepinex-link').href = getBepInExDownloadUrl(release);
+        }
+
+        function setInstallationSteps() {
+            const platform = navigator.platform.toLowerCase();
+            const stepsContainer = document.getElementById('installation-steps');
+            let stepsHtml = '';
+
+            if (platform.includes('win')) {
+                stepsHtml = `
+                    <li>Download the latest version of BepInEx for your platform below and extract it to your Stationeers installation directory. You should end up with a <code>BepInEx</code> folder, <code>winhttp.dll</code>, <code>doorstop_config.ini</code> and <code>.doorstop_version</code> in the same directory as your <code>Stationeers.exe</code> file.</li>
+                    <li>Start the game once to generate the necessary files and folders, then close the game.</li>
+                    <li>Download the latest version of StationeersMods below and extract it to the <code>BepInEx/plugins/</code> folder, which was created in the previous step. You should end up with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code> files in it.</li>
+                    <li>Install mods from the workshop and enjoy your game!</li>
+                `;
+            } else if (platform.includes('mac') || platform.includes('linux')) {
+                stepsHtml = `
+                    <li>Download the latest version of BepInEx for your platform below and extract it to your Stationeers installation directory. You should end up with a <code>BepInEx</code> folder in the same directory as your <code>Stationeers</code> executable file.</li>
+                    <li>Open a terminal and navigate to your Stationeers installation directory.</li>
+                    <li>Run the following command to set the executable permissions for the BepInEx scripts:</li>
+                    <pre><code>chmod +x ./BepInEx/*</code></pre>
+                    <li>Start the game once to generate the necessary files and folders, then close the game.</li>
+                    <li>Download the latest version of StationeersMods below and extract it to the <code>BepInEx/plugins/</code> folder, which was created in the previous step. You should end up with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code> files in it.</li>
+                    <li>Install mods from the workshop and enjoy your game!</li>
+                `;
+            } else {
+                stepsHtml = `
+                    <li>Download the latest version of BepInEx for your platform below and extract it to your Stationeers installation directory. You should end up with a <code>BepInEx</code> folder in the same directory as your <code>Stationeers</code> executable file.</li>
+                    <li>Start the game once to generate the necessary files and folders, then close the game.</li>
+                    <li>Download the latest version of StationeersMods below and extract it to the <code>BepInEx/plugins/</code> folder, which was created in the previous step. You should end up with a <code>BepInEx/plugins/StationeersMods</code> folder with a couple of <code>dll</code> files in it.</li>
+                    <li>Install mods from the workshop and enjoy your game!</li>
+                `;
+            }
+
+            stepsContainer.innerHTML = stepsHtml;
+        }
+
+        setInstallationSteps();
         fetchReleases();
+        fetchBepInExRelease();
 
         // Smoother parallax scrolling with requestAnimationFrame
         let lastScrollY = 0;
