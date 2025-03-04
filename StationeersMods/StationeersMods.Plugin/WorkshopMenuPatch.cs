@@ -348,7 +348,7 @@ namespace StationeersMods.Plugin
                     return (CustomModAbout)(string.IsNullOrEmpty(root) ? new XmlSerializer(typeof(CustomModAbout)) : new XmlSerializer(typeof(CustomModAbout), new XmlRootAttribute(root)))
                         .Deserialize(streamReader);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return default(CustomModAbout);
             }
@@ -369,7 +369,7 @@ namespace StationeersMods.Plugin
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -547,7 +547,7 @@ namespace StationeersMods.Plugin
         {
             public ModVersionInfo Info;
             public List<PluginSettingsGroupData> Categories;
-            public int Height;
+            // public int Height;
 
 
             public sealed class PluginSettingsGroupData

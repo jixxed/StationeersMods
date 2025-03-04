@@ -28,7 +28,7 @@ namespace StationeersMods.Plugin.Configuration
         private static SettingEntryBase _currentKeyboardShortcutToSet;
         public static bool SettingKeyboardShortcut => _currentKeyboardShortcutToSet != null;
         
-        private static SettingFieldDrawer _instance;
+        // private static SettingFieldDrawer _instance;
         private static int _rightColumnWidth;
         private static float _yMax;
         

@@ -226,7 +226,7 @@ namespace StationeersMods
                         addedHandles.Add(workshopHandle);
                     try
                     {
-                        if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.LocalPath != item.DirectoryPath)))
+                        if (WorkshopMenu.ModsConfig.Mods.All<ModData>((Func<ModData, bool>) (x => x.DirectoryPath != item.DirectoryPath)))
                             WorkshopMenu.ModsConfig.Mods.Add(ModData.CreateFrom(item));
                     }
                     catch (Exception ex)
@@ -381,7 +381,7 @@ namespace StationeersMods
 
         private static List<ModData> getEnabledMods()
         {
-            return WorkshopMenu.ModsConfig.Mods.FindAll(mod => mod.IsEnabled);
+            return WorkshopMenu.ModsConfig.Mods.FindAll(mod => mod.Enabled);
         }
 
         private static void validateDependencies(List<ModVersion> availableMods, CustomModAbout modAbout)
@@ -415,7 +415,7 @@ namespace StationeersMods
                 ModData modData = mods[index];
                 if (File.Exists(modData.AboutXmlPath))
                 {
-                    Debug.Log("Loading about data for: " + modData.LocalPath + " - " + modData.AboutXmlPath);
+                    Debug.Log("Loading about data for: " + modData.DirectoryPath + " - " + modData.AboutXmlPath);
                     var aboutData = XmlSerialization.Deserialize<CustomModAbout>(modData.AboutXmlPath, "ModMetadata");
                     //LogMod(aboutData);
                     if( aboutData.Version != null)//version is a string and can be null
