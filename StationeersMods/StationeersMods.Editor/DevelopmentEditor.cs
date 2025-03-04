@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Objects.Pipes;
+using BepInEx;
 using HarmonyLib;
 using StationeersMods.Shared;
 using UnityEditor;
@@ -159,7 +160,37 @@ namespace StationeersMods.Editor
                     {
                         EditorUtility.DisplayDialog("Error", ex.Message, "OK");
                     }
+                    AssetDatabase.Refresh();
                 };
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Auto reference: ", GUILayout.Width(200));
+            var csharpDLL = "Assets/Assemblies/Assembly-CSharp.dll";
+            PluginImporter importer = AssetImporter.GetAtPath(csharpDLL) as PluginImporter;
+            var assemblyPresent = importer != null;
+            var autoReferenced = !IsExplicitlyReferenced(importer);
+            EditorGUILayout.LabelField(assemblyPresent
+                ? csharpDLL + (autoReferenced ? " is auto referenced, resulting in compilation errors!" : " is not auto referenced. Excellent!")
+                : csharpDLL + " not found. Did you copy over assemblies?");
+            if (assemblyPresent && autoReferenced)
+            {
+                if (GUILayout.Button("Fix", GUILayout.Width(buttonWidth), GUILayout.Height(35)))
+                {
+                    EditorApplication.delayCall += () =>
+                    {
+                        try
+                        {
+                            DisableAutoReferenced(csharpDLL);
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            EditorUtility.DisplayDialog("Error", ex.Message, "OK");
+                        }
+                    };
+                }
             }
 
             GUILayout.EndHorizontal();
@@ -192,12 +223,12 @@ namespace StationeersMods.Editor
 
                 if (File.Exists(assemblyToCopy))
                 {
-                    Debug.Log("Copy: " + assemblyToCopy + " to " + assembliesFolder);
+                    LogUtility.LogInfo("Copy: " + assemblyToCopy + " to " + assembliesFolder);
                     File.Copy(assemblyToCopy, Path.Combine(assembliesFolder, Path.GetFileName(assemblyToCopy)), true);
                 }
                 else
                 {
-                    Debug.LogError("Error: " + assemblyToCopy + " doesn't exist");
+                    LogUtility.LogError("Error: " + assemblyToCopy + " doesn't exist");
                     errors.Add(assemblyToCopy);
                 }
             }
@@ -205,6 +236,33 @@ namespace StationeersMods.Editor
             if (errors.Count > 0)
             {
                 throw new ArgumentException("Failed to copy the following assemblies:\n" + string.Join("\n", errors));
+            }
+        }
+        private bool IsExplicitlyReferenced(PluginImporter importer )
+        {
+                return importer != null && (bool)importer.GetType()
+                    .GetProperty("IsExplicitlyReferenced", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.GetValue(importer)!;
+        }
+        
+        private void DisableAutoReferenced(string dllPath)
+        {
+            PluginImporter importer = AssetImporter.GetAtPath(dllPath) as PluginImporter;
+            if (importer != null)
+            {
+                SerializedObject serializedImporter = new SerializedObject(importer);
+                SerializedProperty isExplicitlyReferencedProp = serializedImporter.FindProperty("m_IsExplicitlyReferenced");
+                if (isExplicitlyReferencedProp != null && !isExplicitlyReferencedProp.boolValue)
+                {
+                    isExplicitlyReferencedProp.boolValue = true;
+                    serializedImporter.ApplyModifiedProperties();
+                    importer.SaveAndReimport();
+                    Debug.Log($"Auto reference disabled for {dllPath}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"PluginImporter not found for {dllPath}");
             }
         }
     }

@@ -149,39 +149,13 @@ namespace StationeersMods
                     BindingFlags.NonPublic | BindingFlags.Static)));
             AddLocalAndWorkshopItems();
         }
-
-        // private static void LoadDataFiles()
-        // {
-        //     WorldManager.LoadDataFilesAtPath(Application.streamingAssetsPath + "/Data");
-        //     List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
-        //     for (int index = mods.Count - 1; index >= 0; --index)
-        //     {
-        //         ModData modData = mods[index];
-        //         if (!modData.IsCore && modData.IsEnabled)
-        //             WorldManager.LoadDataFilesAtPath(modData.LocalPath + "/GameData");
-        //     }
-        // }
+        
         private static bool WorldManagerFix()
         {
             initMods();
-            List<ModData> mods = WorkshopMenu.ModsConfig?.Mods != null ? WorkshopMenu.ModsConfig.Mods : new List<ModData>();
             try
             {
                 validateModOrder();
-                // for (int index = mods.Count - 1; index >= 0; --index)
-                // {
-                //     ModData modData = mods[index];
-                //     if (!(modData is CoreModData) && modData.Enabled)
-                //     {
-                //         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                //             ?.Invoke(null, new object[] {modData.LocalPath + "/GameData"});
-                //     }
-                //     else if (modData is CoreModData)
-                //     {
-                //         typeof(WorldManager).GetMethod("LoadDataFilesAtPath", BindingFlags.NonPublic | BindingFlags.Static)
-                //             ?.Invoke(null, new object[] {Application.streamingAssetsPath + "/Data"});
-                //     }
-                // }
             }
             catch (MissingDependencyException ex)
             {
@@ -278,7 +252,7 @@ namespace StationeersMods
                 }
 
                 validationResult.Retry = false;
-                List<ModData> allMods = WorkshopMenu.ModsConfig.Mods;
+                List<ModData> allMods = getEnabledMods();
                 List<ModVersion> availableMods = listAvailableMods();
                 Debug.Log("available mods: " + availableMods.Join((mod) => mod.ToString(), ","));
 
@@ -331,7 +305,7 @@ namespace StationeersMods
                 //not all required dependencies have been listed after
                 loadBefore.FindAll(beforeMod => loadedMods.Any(loadedMod => loadedMod.IsSame(beforeMod.Version, beforeMod.Id))).ForEach(beforeMod =>
                 {
-                    var mod = WorkshopMenu.ModsConfig.Mods.Find(modx =>
+                    var mod = getEnabledMods().Find(modx =>
                     {
                         if (beforeMod.Id == 1UL)
                         {
@@ -375,7 +349,7 @@ namespace StationeersMods
                     .ForEach(
                         afterMod =>
                         {
-                            var mod = WorkshopMenu.ModsConfig.Mods.Find(modx =>
+                            var mod = getEnabledMods().Find(modx =>
                             {
                                 if (afterMod.Id == 1UL)
                                 {
@@ -405,6 +379,11 @@ namespace StationeersMods
             return false;
         }
 
+        private static List<ModData> getEnabledMods()
+        {
+            return WorkshopMenu.ModsConfig.Mods.FindAll(mod => mod.IsEnabled);
+        }
+
         private static void validateDependencies(List<ModVersion> availableMods, CustomModAbout modAbout)
         {
             var dependencies = modAbout.Dependencies;
@@ -428,7 +407,7 @@ namespace StationeersMods
 
         private static List<ModVersion> listAvailableMods()
         {
-            List<ModData> mods = WorkshopMenu.ModsConfig.Mods;
+            List<ModData> mods = getEnabledMods();
             List<ModVersion> available = new List<ModVersion>();
             available.Add(new ModVersion(VersionHelper.GameVersion(), 1UL)); //core mod
             for (int index = mods.Count - 1; index >= 0; --index)
