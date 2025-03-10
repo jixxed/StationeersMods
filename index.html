@@ -376,11 +376,12 @@
 
         // Fetch releases
         async function fetchReleases() {
-            const response = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
-            const releases = await response.json();
+            const responseStable = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases/latest');
+            const responseBeta = await fetch('https://api.github.com/repos/jixxed/StationeersMods/releases');
+            const releasesBeta = await responseBeta.json();
 
-            const stableRelease = releases.find(release => !release.prerelease);
-            const betaRelease = releases.find(release => release.prerelease);
+            const stableRelease = await responseStable.json();
+            const betaRelease = releasesBeta.find(release => release.prerelease);
 
             const stableVersion = stableRelease ? stableRelease.tag_name : 'N/A';
             const betaVersion = betaRelease ? betaRelease.tag_name : 'N/A';
