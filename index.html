@@ -418,7 +418,7 @@
 
             // Provide the stable link if the stable version is higher
             if (versionComparison > 0) {
-                document.getElementById('beta-link').href = document.getElementById('stable-link').href;
+                document.getElementById('beta-link').href = getDownloadUrl(stableRelease);
             } else {
                 document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
             }
