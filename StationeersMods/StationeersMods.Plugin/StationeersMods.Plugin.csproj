@@ -81,6 +81,7 @@
     <Compile Include="SteamUGCPatch.cs" />
     <Compile Include="TextureScaler.cs" />
     <Compile Include="WorkshopMenuPatch.cs" />
+    <Compile Include="DataCollectionPatch.cs" />
     <Compile Include="WorldManagerPatch.cs" />
   </ItemGroup>
   <ItemGroup>
