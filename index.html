@@ -416,8 +416,8 @@
             // Set the stable link to the zip asset
             document.getElementById('stable-link').href = getDownloadUrl(stableRelease);
 
-            // Provide the stable link if the stable version is higher
-            if (versionComparison > 0) {
+            // Provide the stable link if the stable version is higher or equal
+            if (versionComparison >= 0) {
                 document.getElementById('beta-link').href = getDownloadUrl(stableRelease);
             } else {
                 document.getElementById('beta-link').href = getDownloadUrl(betaRelease);
