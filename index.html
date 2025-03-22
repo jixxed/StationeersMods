@@ -384,7 +384,7 @@
             const betaRelease = releasesBeta.find(release => release.prerelease);
 
             const stableVersion = stableRelease ? stableRelease.tag_name : 'N/A';
-            const betaVersion = betaRelease ? betaRelease.tag_name : 'N/A';
+            const betaVersion = betaRelease ? betaRelease.tag_name : stableVersion;
 
             document.getElementById('stable-version').textContent = stableVersion;
 
